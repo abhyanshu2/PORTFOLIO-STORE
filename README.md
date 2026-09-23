@@ -28,23 +28,3 @@ src/vite-env.d.ts /// <reference types="vite/client" /> declare module '.glb'; d
 
 yea raha code ab 2 nd change hai ke jo image hum denga portfolio ka usma upar website ka name ka bagal ma logo hota hai oaha image hona chaiya mera hum apna image v deta hai usko id card pa v add kar dena yeak side ma or id card ka nicha mera name v hona chaiya ABHYANSHU
 
-This project was built with [Lovable](https://lovable.dev).
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/1669602d-b407-470b-8b00-19561d9013e6).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
-```
