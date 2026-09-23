@@ -1,0 +1,13 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NITRO_PRESET = "netlify"
+
+# Nitro (this project's SSR build engine) defaults to a "cloudflare-module"
+# build when it can't detect a hosting platform (e.g. when building locally
+# via `netlify deploy --build`, since that command doesn't set the platform
+# env vars Nitro's auto-detection relies on). NITRO_PRESET=netlify forces it
+# to always build in the correct format for Netlify Functions instead.
