@@ -1,50 +1,197 @@
-# Portfolio Card Creator
+# Abhyanshu Raj Portfolio and Store
 
-pahla changes hai ke isma hum yeak id card ka featurse add kiya tha jo proper work nahi kr raha tumko usko remove kar do or hum new id card ka code tumko deta hai usko mera portfolio ma add karo exect position kaha pa add karna hai uska liya hum yeak image denga jaha red mark kiya hua hai image ka left side (import Lanyard from './Lanyard' <Lanyard position={[0, 0, 20]} gravity={[0, -40, 0]} /> // Pass custom images for the card's front/back faces and/or the lanyard band. // frontImage and backImage render independently; imageFit keeps aspect ratio. // lanyardWidth widens the band so a custom band image has more room. <Lanyard position={[0,0,25]} gravity={[0,-40,0]} frontImage="/my-front.png" backImage="/my-back.png" imageFit="cover" lanyardImage="/my-band.png" lanyardWidth={1} /> /* IMPORTANT INFO BELOW
+This is my personal portfolio website. It also has a small digital store inside it, where people can look at templates, apps, free resources and services, and contact me on WhatsApp to buy or hire. I manage everything from a private admin page.
 
-You MUST have the card.glb and lanyard.png files in your project and import them
+## Contents
 
-these can be downloaded from the repo's files, under src/assets/lanyard
+- [What is inside](#what-is-inside)
+- [Tech used](#tech-used)
+- [Folder structure](#folder-structure)
+- [Run it on your computer](#run-it-on-your-computer)
+- [Environment variables](#environment-variables)
+- [Supabase setup](#supabase-setup)
+- [How to use the website](#how-to-use-the-website)
+- [Admin page](#admin-page)
+- [Changing the content](#changing-the-content)
+- [Deploy on Vercel](#deploy-on-vercel)
+- [Commands](#commands)
 
-You can edit your card.glb file in this online .glb editor and change the texture:
+## What is inside
 
-https://modelviewer.dev/editor/
+**Portfolio**
+- One page with these sections: Hero, About, Skills, Projects, Education and Contact
+- Light and dark theme button
+- Fluid cursor effect
+- Mobile menu
+- Contact form. The messages are saved in the database and I read them in the admin page
+- A "Visit Store" button that opens the store on top of the portfolio
 
-alternatively, pass the "frontImage" / "backImage" props to swap the card's faces at runtime
+**Store**
+- Templates for Birthday, Proposal, Wedding and Sorry pages, with category filter and search
+- My Products, which shows my apps as Live or Coming soon
+- Free Resources like notes and PDFs
+- Services that people can hire me for, with starting prices
+- Buy Now and Hire Me buttons open WhatsApp with a ready message. Each click is also saved as an order so I can follow up
+- If the database is not working, the store shows the built-in data, so it never looks empty
 
-The png file is the texture for the lanyard's band and can be edited in any image editor
+**Birthday Scrapbook demo**
+- Live demo of one of my templates at `/templates/birthday-scrapbook`
+- A photo collage page and a flip book page at `/templates/birthday-scrapbook/book`
+- You can upload your own photos and change every caption
+- Works on mobile and desktop
 
-Your Vite configuration must be updated to include the following in vite.config.js: assetsInclude: ['**/*.glb']
+**Admin page**
+- Private page at `/admin`, login is at `/admin/login`
+- Add, edit and delete templates, products, resources and services
+- See orders and messages
 
-For TS users, you might need these changes:
+## Tech used
 
-src/global.d.ts export { }; declare module '.glb'; declare module '.png'; declare module 'meshline' { export const MeshLineGeometry: any; export const MeshLineMaterial: any; } declare global { namespace JSX { interface IntrinsicElements { meshLineGeometry: any; meshLineMaterial: any; } } }
+- TanStack Start (React 19 with TanStack Router)
+- Vite and Nitro
+- Tailwind CSS 4, Radix UI and shadcn/ui
+- Supabase for database, login and file storage
+- React Hook Form and Zod for forms
+- TypeScript
 
-src/vite-env.d.ts /// <reference types="vite/client" /> declare module '.glb'; declare module '.png'; */
+## Folder structure
 
-.lanyard-wrapper { position: relative; z-index: 0; width: 100%; height: 100vh; display: flex; justify-content: center; align-items: center; transform: scale(1); transform-origin: center; }
+```
+public/                  images, favicon, robots.txt
+src/
+  routes/                all pages (home, admin, scrapbook demo)
+  components/
+    portfolio/           portfolio sections, contact form, cursor effect
+    store/               store overlay
+    admin/               admin tables and panels
+    templates/           scrapbook template parts
+    ui/                  small reusable components
+  data/store/            built-in store data and contact details
+  lib/                   supabase client, data hooks, upload helper
+  styles.css             global styles
+supabase/schema.sql      database tables, rules and starter data
+.env.example             sample environment file
+vite.config.ts           build settings
+```
 
-)
+## Run it on your computer
 
-yea raha code ab 2 nd change hai ke jo image hum denga portfolio ka usma upar website ka name ka bagal ma logo hota hai oaha image hona chaiya mera hum apna image v deta hai usko id card pa v add kar dena yeak side ma or id card ka nicha mera name v hona chaiya ABHYANSHU
+You need Node.js 20 or newer and a free Supabase account.
 
-This project was built with [Lovable](https://lovable.dev).
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/1669602d-b407-470b-8b00-19561d9013e6).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+```bash
+npm install
+cp .env.example .env
 npm run dev
 ```
+
+Open `.env` and put your own Supabase values in it (see the next section). After that the site opens at the address shown in the terminal, usually `http://localhost:3000`.
+
+## Environment variables
+
+Make a `.env` file in the main folder, next to `package.json`:
+
+```env
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
+
+You can find both in Supabase under Project Settings, then API.
+
+Do not upload the `.env` file to GitHub. It is already in `.gitignore`.
+
+## Supabase setup
+
+Do this one time for a new project.
+
+**1. Create the tables**
+
+Open your Supabase project, go to SQL Editor and click New query. Copy everything from `supabase/schema.sql`, paste it and press Run.
+
+This creates all the tables, the security rules and some starter content. The rules are simple:
+- Anyone can read the store items
+- Anyone can send an order click or a contact message
+- Only the logged in admin can read orders and messages or change the store items
+
+**2. Create the storage bucket**
+
+Photo uploads go to a bucket called `template-media`.
+- Go to Storage and click New bucket
+- Name it exactly `template-media`
+- Turn on Public bucket
+
+**3. Create the admin user**
+
+Go to Authentication, then Users, then Add user. Enter your email and a strong password. Use the same details to log in at `/admin/login`.
+
+## How to use the website
+
+**As a visitor**
+1. Scroll down the portfolio or use the top menu to jump to a section.
+2. Click Visit Store to open the store.
+3. Pick a category or type in the search box to find a template.
+4. If a template has a demo, open it to see how it works.
+5. Click Buy Now. WhatsApp opens with a message that already has the product name. Send it and you will get the payment details.
+6. For work, go to Services and click Hire Me.
+7. Free resources can be opened or downloaded directly.
+8. To message me, use the contact form at the bottom of the portfolio.
+
+**Using the Birthday Scrapbook demo**
+1. Open the demo from the store.
+2. Click a photo slot to add your own picture.
+3. Click any text to change it.
+4. Drag, zoom and pin photos on the collage page.
+5. Open the book page to flip through it.
+6. Your changes are saved in your browser.
+
+## Admin page
+
+Go to `/admin/login` and sign in with the user you made in Supabase.
+
+- **Templates**: add, edit and delete templates, set price, badge and category
+- **My Products**: manage apps and mark them Live or Coming soon
+- **Resources**: add or remove free downloads
+- **Services**: change names, descriptions, features and prices
+- **Orders**: see every Buy Now and Hire Me click and set the status to new, contacted or closed
+- **Messages**: read contact form messages, mark as read or delete
+
+Changes show on the live site straight away. No redeploy is needed.
+
+## Changing the content
+
+| What | Where |
+| --- | --- |
+| WhatsApp number, email, social links | `src/data/store/contact.ts` |
+| Portfolio text, projects, skills, education | `src/components/portfolio/Portfolio.tsx` |
+| Page title and description | `src/routes/index.tsx` |
+| Colours and fonts | `src/styles.css` |
+| Built-in store data | `src/data/store/` |
+| Profile photo and favicon | `public/` |
+| Store items on the live site | Admin page |
+
+## Deploy on Vercel
+
+1. Push the project to a GitHub repository.
+2. On Vercel click Add New, then Project, and import the repository.
+3. Add these two environment variables before deploying:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+4. Click Deploy.
+
+Add the variables before the first deploy. They are built into the site while it builds, so if you add them later you have to redeploy.
+
+The project is already set up for Vercel in `vite.config.ts`, so nothing else needs to be changed.
+
+## Commands
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | starts the dev server |
+| `npm run build` | makes a production build |
+| `npm run preview` | previews the production build |
+| `npm run lint` | checks the code for problems |
+| `npm run format` | formats the code with Prettier |
+
+## Contact
+
+Abhyanshu Raj, Frontend Developer
+GitHub: [github.com/abhyanshu2](https://github.com/abhyanshu2)
