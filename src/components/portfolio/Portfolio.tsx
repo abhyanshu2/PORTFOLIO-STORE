@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ContactForm } from "./ContactForm";
+import { PixelWipe, type PixelWipeHandle } from "./PixelWipe";
 import { useProjects } from "@/lib/use-store-data";
 
 
@@ -13,6 +14,7 @@ export function Portfolio({ onOpenStore }: Props) {
   const [scrolled, setScrolled] = useState(false);
   const [wiping, setWiping] = useState(false);
   const roleRef = useRef<HTMLDivElement | null>(null);
+  const wipeRef = useRef<PixelWipeHandle | null>(null);
 
   // Sync theme onto <html>
   useEffect(() => {
@@ -97,16 +99,29 @@ export function Portfolio({ onOpenStore }: Props) {
     return () => { cancelled = true; };
   }, []);
 
-  const toggleTheme = () => {
+  const toggleTheme = async () => {
+    if (wiping) return;
+    setWiping(true);
+    const nextDark = theme === "light";
+    await wipeRef.current?.run({
+      color: nextDark ? "#0a0a0a" : "#faf8f5",
+      onCover: () => setTheme(nextDark ? "dark" : "light"),
+    });
+    setWiping(false);
+  };
+
+  // Store keeps the original left-to-right sweep
+  const openStore = () => {
     if (wiping) return;
     setWiping(true);
     const wipe = document.getElementById("theme-wipe");
-    const nextDark = theme === "light";
     if (wipe) {
-      wipe.style.background = nextDark ? "#0a0a0a" : "#faf8f5";
+      wipe.style.background = theme === "dark" ? "#0a0a0a" : "#faf8f5";
       wipe.classList.add("wiping");
     }
-    setTimeout(() => setTheme(nextDark ? "dark" : "light"), 275);
+    // Store should appear instantly while the sweep covers the screen
+    document.documentElement.classList.add("store-wiping");
+    setTimeout(() => onOpenStore(), 275);
     setTimeout(() => {
       if (wipe) {
         wipe.classList.remove("wiping");
@@ -114,11 +129,13 @@ export function Portfolio({ onOpenStore }: Props) {
       }
       setWiping(false);
     }, 580);
+    setTimeout(() => document.documentElement.classList.remove("store-wiping"), 650);
   };
 
   return (
     <>
       <div id="theme-wipe"></div>
+      <PixelWipe ref={wipeRef} />
 
       {/* Mobile menu */}
       <div className={`mobile-menu${menuOpen ? " open" : ""}`}>
@@ -126,7 +143,7 @@ export function Portfolio({ onOpenStore }: Props) {
         {["about", "skills", "projects", "education", "contact"].map((s) => (
           <a key={s} href={`#${s}`} onClick={() => setMenuOpen(false)}>{s.charAt(0).toUpperCase() + s.slice(1)}</a>
         ))}
-        <a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); onOpenStore(); }}>Store</a>
+        <a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); openStore(); }}>Store</a>
       </div>
 
       {/* NAV */}
@@ -145,7 +162,7 @@ export function Portfolio({ onOpenStore }: Props) {
             <div className="tog-track"><div className="tog-thumb"></div></div>
             <span className="tog-label">{theme === "dark" ? "LIGHT" : "DARK"}</span>
           </button>
-          <a href="#" className="nav-resume" onClick={(e) => { e.preventDefault(); onOpenStore(); }}>Visit Store ↗</a>
+          <a href="#" className="nav-resume" onClick={(e) => { e.preventDefault(); openStore(); }}>Visit Store ↗</a>
           <button className="hamburger" aria-label="Menu" onClick={() => setMenuOpen((v) => !v)} style={menuOpen ? { transform: "none" } : undefined}>
             <span></span><span></span><span></span>
           </button>
@@ -169,7 +186,7 @@ export function Portfolio({ onOpenStore }: Props) {
             <p className="hero-desc"><strong>Building pixel-perfect interfaces</strong> with modern web technologies. Passionate about React, Next.js &amp; creating experiences that feel intentional. Based in <strong>Vaishali, Bihar</strong>.</p>
             <div className="hero-ctas">
               <a href="#projects" className="btn-primary">View My Work</a>
-              <button type="button" className="btn-ghost" onClick={onOpenStore} style={{ font: "inherit" }}>Visit Store ↗</button>
+              <button type="button" className="btn-ghost" onClick={openStore} style={{ font: "inherit" }}>Visit Store ↗</button>
             </div>
           </div>
         </div>
