@@ -5,12 +5,14 @@ import { supabase } from "@/lib/supabase";
 import { CrudTable } from "@/components/admin/CrudTable";
 import { OrdersPanel } from "@/components/admin/OrdersPanel";
 import { MessagesPanel } from "@/components/admin/MessagesPanel";
+import { DriftPanel } from "@/components/admin/DriftPanel";
 import {
   TEMPLATES_CONFIG,
   MY_PRODUCTS_CONFIG,
   RESOURCES_CONFIG,
   SERVICES_CONFIG,
   PORTFOLIO_PROJECTS_CONFIG,
+  EXPERIENCE_CONFIG,
 } from "@/lib/admin-schemas";
 
 export const Route = createFileRoute("/admin/")({
@@ -22,10 +24,12 @@ export const Route = createFileRoute("/admin/")({
 
 const TABS = [
   { key: "projects", label: "Portfolio Projects" },
+  { key: "experience", label: "Experience" },
   { key: "templates", label: "Templates" },
   { key: "products", label: "My Products" },
   { key: "resources", label: "Resources" },
   { key: "services", label: "Services" },
+  { key: "drift", label: "Hero Wall" },
   { key: "orders", label: "Orders" },
   { key: "messages", label: "Messages" },
 ] as const;
@@ -102,10 +106,12 @@ function AdminDashboardPage() {
 
       <main className="admin-main">
         {tab === "projects" && <CrudTable config={PORTFOLIO_PROJECTS_CONFIG} />}
+        {tab === "experience" && <CrudTable config={EXPERIENCE_CONFIG} />}
         {tab === "templates" && <CrudTable config={TEMPLATES_CONFIG} />}
         {tab === "products" && <CrudTable config={MY_PRODUCTS_CONFIG} />}
         {tab === "resources" && <CrudTable config={RESOURCES_CONFIG} />}
         {tab === "services" && <CrudTable config={SERVICES_CONFIG} />}
+        {tab === "drift" && <DriftPanel />}
         {tab === "orders" && <OrdersPanel />}
         {tab === "messages" && <MessagesPanel />}
       </main>

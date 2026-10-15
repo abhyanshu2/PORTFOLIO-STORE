@@ -1,4 +1,4 @@
-export type FieldType = "text" | "textarea" | "number" | "url" | "select" | "array" | "image" | "video" | "image-array";
+export type FieldType = "text" | "textarea" | "lines" | "number" | "url" | "select" | "array" | "image" | "video" | "image-array";
 
 export interface FieldConfig {
   key: string;
@@ -18,6 +18,7 @@ export interface TableConfig {
   fields: FieldConfig[];
   listColumns: string[];
   noAddDelete?: boolean; // fixed set of rows — edit only, no add/delete UI
+  titleKey?: string; // column shown as the row title (defaults to "name")
 }
 
 export const TEMPLATES_CONFIG: TableConfig = {
@@ -121,4 +122,23 @@ export const PORTFOLIO_PROJECTS_CONFIG: TableConfig = {
     { key: "year", label: "Year", type: "text" },
   ],
   listColumns: ["name", "year"],
+};
+
+export const EXPERIENCE_CONFIG: TableConfig = {
+  table: "experience",
+  title: "Experience",
+  singular: "Experience",
+  primaryKey: "id",
+  orderBy: "sort_order",
+  titleKey: "role",
+  fields: [
+    { key: "role", label: "Role / title", type: "text", required: true, placeholder: "e.g. Full Stack Developer Intern" },
+    { key: "place", label: "Company or project", type: "text", required: true, placeholder: "e.g. Sysnet Global Technologies (P) Ltd" },
+    { key: "dates", label: "Dates (shown on the right)", type: "text", required: true, placeholder: "e.g. Jun 2026 – Present" },
+    { key: "status", label: "Status", type: "select", required: true, options: ["current", "past"] },
+    { key: "points", label: "What you did (one point per line)", type: "lines", placeholder: "Write each point on its own line" },
+    { key: "tags", label: "Tech / skills (comma separated)", type: "array" },
+    { key: "sort_order", label: "Sort Order (smaller shows first)", type: "number" },
+  ],
+  listColumns: ["role", "place", "dates", "status"],
 };

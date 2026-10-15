@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ContactForm } from "./ContactForm";
+import { ContactSection } from "./ContactSection";
+import { ExperienceSection } from "./ExperienceSection";
 import { PixelWipe, type PixelWipeHandle } from "./PixelWipe";
+import DriftWall from "./DriftWall";
+import { useDriftWall } from "@/lib/drift-wall";
 import { useProjects } from "@/lib/use-store-data";
 
 
@@ -15,6 +18,28 @@ export function Portfolio({ onOpenStore }: Props) {
   const [wiping, setWiping] = useState(false);
   const roleRef = useRef<HTMLDivElement | null>(null);
   const wipeRef = useRef<PixelWipeHandle | null>(null);
+  const drift = useDriftWall();
+  const heroRef = useRef<HTMLElement | null>(null);
+
+  // The hero wall starts right after the last letter of the name and right under the menu bar
+  useEffect(() => {
+    const hero = heroRef.current;
+    const title = hero?.querySelector(".hero-title");
+    const nav = document.querySelector("nav");
+    if (!hero || !title) return;
+    const update = () => {
+      const heroBox = hero.getBoundingClientRect();
+      const titleBox = title.getBoundingClientRect();
+      hero.style.setProperty("--drift-left", `${Math.round(titleBox.right - heroBox.left)}px`);
+      hero.style.setProperty("--drift-top", `${nav ? nav.offsetHeight : 88}px`);
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(title);
+    observer.observe(hero);
+    if (nav) observer.observe(nav);
+    return () => observer.disconnect();
+  }, []);
 
   // Sync theme onto <html>
   useEffect(() => {
@@ -140,7 +165,7 @@ export function Portfolio({ onOpenStore }: Props) {
       {/* Mobile menu */}
       <div className={`mobile-menu${menuOpen ? " open" : ""}`}>
         <button className="mobile-close" aria-label="Close" onClick={() => setMenuOpen(false)}>✕</button>
-        {["about", "skills", "projects", "education", "contact"].map((s) => (
+        {["about", "skills", "projects", "experience", "education", "contact"].map((s) => (
           <a key={s} href={`#${s}`} onClick={() => setMenuOpen(false)}>{s.charAt(0).toUpperCase() + s.slice(1)}</a>
         ))}
         <a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); openStore(); }}>Store</a>
@@ -148,11 +173,12 @@ export function Portfolio({ onOpenStore }: Props) {
 
       {/* NAV */}
       <nav id="nav" className={scrolled ? "scrolled" : ""}>
-        <a href="#" className="nav-logo">Abhyanshu<span>.</span></a>
+        <a href="#" className="nav-logo">Abhyanshu<span></span></a>
         <ul className="nav-links">
           <li><a href="#about">About</a></li>
           <li><a href="#skills">Skills</a></li>
           <li><a href="#projects">Projects</a></li>
+          <li><a href="#experience">Experience</a></li>
           <li><a href="#education">Education</a></li>
           <li><a href="#contact">Contact</a></li>
         </ul>
@@ -170,15 +196,43 @@ export function Portfolio({ onOpenStore }: Props) {
       </nav>
 
       {/* HERO */}
-      <section className="hero" id="hero">
+      <section className="hero" id="hero" ref={heroRef}>
         <div className="hero-blob"></div>
         <div className="hero-grid"></div>
         <div className="hero-vline"></div>
+        {drift.ready && drift.settings.enabled && (
+          <div className="hero-drift" aria-hidden="true">
+            <DriftWall
+              items={drift.items}
+              columns={drift.settings.columns}
+              tileWidth={drift.settings.tile_width}
+              tileHeight={drift.settings.tile_height}
+              gap={drift.settings.gap}
+              radius={drift.settings.radius}
+              tilt={drift.settings.tilt}
+              turn={drift.settings.turn}
+              roll={0}
+              perspective={1200}
+              depth={120}
+              speed={drift.settings.speed}
+              direction="up"
+              variance={0.45}
+              parallax={0.6}
+              lift={64}
+              fade={0.6}
+              maskMode="open-top"
+              dim={drift.settings.dim}
+              overlayColor="var(--bg)"
+              pauseOnHover={false}
+              grayscale={false}
+            />
+          </div>
+        )}
         <div className="hero-badge">
           <Link to="/admin/login" aria-label="Admin" className="badge-dot" style={{ cursor: "pointer" }}></Link>
           OPEN TO OPPORTUNITIES
         </div>
-        <div className="hero-number">01 — INTRODUCTION</div>
+        <div className="hero-number"></div>
         <h1 className="hero-title">ABHYANSHU<br /><span className="dim">Raj</span></h1>
         <div className="hero-subtitle-row">
           <div className="hero-role" ref={roleRef}></div>
@@ -208,7 +262,7 @@ export function Portfolio({ onOpenStore }: Props) {
       {/* ABOUT */}
       <section className="about" id="about">
         <div className="about-left fade-up">
-          <div className="section-label">01 — about</div>
+          <div className="section-label">01 About</div>
           <div className="big-text">WHO<br />I <em>AM.</em></div>
           <div className="stats-row">
             <div className="stat"><span className="stat-num">2+</span><span className="stat-label">Years Learning</span></div>
@@ -228,7 +282,7 @@ export function Portfolio({ onOpenStore }: Props) {
       <section className="skills" id="skills">
         <div className="skills-header fade-up">
           <div>
-            <div className="section-label">02 — skills</div>
+            <div className="section-label">02 Skills</div>
             <h2 className="skills-title">MY<br />TOOLKIT</h2>
           </div>
           <p className="skills-desc">Things I build with daily, growing in, and rely on to design, ship, and iterate.</p>
@@ -251,7 +305,7 @@ export function Portfolio({ onOpenStore }: Props) {
       {/* PROJECTS */}
       <section className="projects" id="projects">
         <div className="projects-header fade-up">
-          <div className="section-label">03 — projects</div>
+          <div className="section-label">03 Projects</div>
           <h2 className="projects-title">SELECTED<br /><em style={{ fontStyle: "italic", color: "var(--muted)" }}>Work</em></h2>
         </div>
         <div className="project-featured fade-up">
@@ -306,60 +360,38 @@ export function Portfolio({ onOpenStore }: Props) {
         </div>
       </section>
 
+      {/* EXPERIENCE */}
+      <ExperienceSection />
+
       {/* EDUCATION */}
       <section className="education" id="education">
         <div className="fade-up">
-          <div className="section-label">04 — education</div>
+          <div className="section-label">05 Education</div>
           <h2 className="education-title">LEARNING<br /><em style={{ fontStyle: "italic", color: "var(--muted)" }}>Path</em></h2>
         </div>
         <div className="edu-list fade-up">
           <div className="edu-item">
-            <span className="edu-year">2023 — NOW</span>
-            <span className="edu-degree">Diploma — Computer Science &amp; Engg<br /><small style={{ color: "var(--muted2)", fontSize: 12, fontWeight: 400 }}>Currently in 4th Semester</small></span>
+            <span className="edu-year">2023 NOW</span>
+            <span className="edu-degree">Diploma Computer Science &amp; Engg<br /><small style={{ color: "var(--muted2)", fontSize: 12, fontWeight: 400 }}>Currently in 4th Semester</small></span>
             <span className="edu-school">Pursuing Diploma</span>
             <span className="edu-score">In Progress</span>
           </div>
           <div className="edu-item">
             <span className="edu-year">2023</span>
-            <span className="edu-degree">12th — Science (BSEB)</span>
+            <span className="edu-degree">12th Science (BSEB)</span>
             <span className="edu-school">Akshyawat College Mahua, Vaishali</span>
             <span className="edu-score">60%</span>
           </div>
           <div className="edu-item">
             <span className="edu-year">2021</span>
-            <span className="edu-degree">10th — CBSE</span>
+            <span className="edu-degree">10th CBSE</span>
             <span className="edu-school">Delhi Public School International, Muzaffarpur</span>
             <span className="edu-score">80%</span>
           </div>
         </div>
       </section>
 
-      {/* CONTACT */}
-      <section className="contact" id="contact">
-        <div className="fade-up">
-          <div className="section-label" style={{ display: "inline-block" }}>05 — contact</div>
-          <h2 className="contact-big">LET'S<br /><span className="dim">Build.</span></h2>
-          <p className="contact-sub">Open to frontend roles, full-stack internships, freelance projects, and thoughtful collaborations. Let's create something great together.</p>
-          <div className="contact-cta">
-            <a href="mailto:abhyanshu2@gmail.com" className="btn-primary">Send Email ↗</a>
-            <a href="https://github.com/abhyanshu2" target="_blank" rel="noopener" className="btn-ghost">GitHub ↗</a>
-          </div>
-        </div>
-        <div className="contact-grid fade-up">
-          <div className="contact-item"><div className="contact-item-label">Email</div><a href="mailto:abhyanshu2@gmail.com" className="contact-item-val">abhyanshu2@gmail.com</a></div>
-          <div className="contact-item"><div className="contact-item-label">Phone / WhatsApp</div><a href="tel:+916206358342" className="contact-item-val">+91 6206358342</a></div>
-          <div className="contact-item"><div className="contact-item-label">Instagram</div><a href="https://instagram.com/_abhyanshu" target="_blank" rel="noopener" className="contact-item-val">@_abhyanshu</a></div>
-          <div className="contact-item"><div className="contact-item-label">GitHub</div><a href="https://github.com/abhyanshu2" target="_blank" rel="noopener" className="contact-item-val">github.com/abhyanshu2</a></div>
-        </div>
-        <div className="fade-up" style={{ marginTop: 40 }}>
-          <ContactForm />
-        </div>
-      </section>
-
-      <footer>
-        <div className="footer-left">© {new Date().getFullYear()} ABHYANSHU RAJ — ALL RIGHTS RESERVED</div>
-        <div className="footer-right">DESIGNED WITH PRECISION <span className="footer-heart">✦</span> BUILT WITH PASSION</div>
-      </footer>
+      <ContactSection />
     </>
   );
 }

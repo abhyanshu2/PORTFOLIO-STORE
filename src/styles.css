@@ -326,6 +326,20 @@ nav.scrolled{
 .scroll-line{width:40px;height:1.5px;background:linear-gradient(to right,var(--accent2),transparent);animation:sPulse 2.2s ease-in-out infinite;border-radius:1px}
 @keyframes sPulse{0%,100%{width:40px;opacity:.8}50%{width:50px;opacity:.3}}
 
+/* Drift wall on the right side of the hero (sits behind the text) */
+.hero-drift{
+  position:absolute; top:var(--drift-top,88px); bottom:0; right:0;
+  /* starts after the last letter of the name, but never narrower than 380px */
+  left:min(var(--drift-left,56%),calc(100% - 380px));
+  z-index:-1; --drift-o:1;
+  animation:driftIn 1.4s cubic-bezier(.22,1,.36,1) .5s both;
+}
+@keyframes driftIn{from{opacity:0}to{opacity:var(--drift-o)}}
+/* text blocks only as wide as their text, so the wall stays hoverable */
+.hero-number,.hero-title,.hero-subtitle-row{width:fit-content;max-width:100%}
+@media(max-width:1500px){.hero-drift{--drift-o:.55}}
+@media(max-width:1100px){.hero-drift{display:none}}
+
 /* Buttons */
 .btn-primary{
   padding:13px 28px; background:var(--accent); color:var(--accent-inv);
@@ -572,6 +586,12 @@ footer{padding:28px 52px;border-top:1px solid var(--border);display:flex;justify
   .about,.skills,.projects,.education,.contact{padding:80px 32px}
   .hero-badge{right:32px;top:100px}
   .scroll-indicator{left:32px}
+}
+
+/* six menu links now: tighten them a little on mid-size screens */
+@media(max-width:1180px){
+  .nav-links{gap:22px}
+  .nav-links a{letter-spacing:.12em}
 }
 
 @media(max-width:768px){

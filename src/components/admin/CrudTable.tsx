@@ -15,7 +15,18 @@ function fromArrayInput(val: string) {
     .filter(Boolean);
 }
 
+function toLinesInput(val: string[] | null | undefined) {
+  return (val || []).join("\n");
+}
+function fromLinesInput(val: string) {
+  return val
+    .split(/\r?\n/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
 export function CrudTable({ config }: { config: TableConfig }) {
+  const titleKey = config.titleKey ?? "name";
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +68,12 @@ export function CrudTable({ config }: { config: TableConfig }) {
     const initial: Record<string, string> = {};
     config.fields.forEach((f) => {
       const v = row[f.key];
-      initial[f.key] = f.type === "array" || f.type === "image-array" ? toArrayInput(v) : (v ?? "").toString();
+      initial[f.key] =
+        f.type === "array" || f.type === "image-array"
+          ? toArrayInput(v)
+          : f.type === "lines"
+            ? toLinesInput(v)
+            : (v ?? "").toString();
     });
     setFormValues(initial);
     setFormOpen(true);
@@ -99,6 +115,7 @@ export function CrudTable({ config }: { config: TableConfig }) {
     for (const f of config.fields) {
       const raw = formValues[f.key] ?? "";
       if (f.type === "array" || f.type === "image-array") payload[f.key] = fromArrayInput(raw);
+      else if (f.type === "lines") payload[f.key] = fromLinesInput(raw);
       else if (f.type === "number") payload[f.key] = raw === "" ? null : Number(raw);
       else payload[f.key] = raw === "" ? null : raw;
     }
@@ -115,7 +132,7 @@ export function CrudTable({ config }: { config: TableConfig }) {
   }
 
   async function handleDelete(row: Row) {
-    if (!confirm(`Delete "${row.name ?? row[config.primaryKey]}"? This can't be undone.`)) return;
+    if (!confirm(`Delete "${row[titleKey] ?? row[config.primaryKey]}"? This can't be undone.`)) return;
     setDeletingId(row[config.primaryKey]);
     const { error: err } = await supabase.from(config.table).delete().eq(config.primaryKey, row[config.primaryKey]);
     setDeletingId(null);
@@ -189,10 +206,10 @@ export function CrudTable({ config }: { config: TableConfig }) {
             {rows.map((row) => (
               <div key={row[config.primaryKey]} className="admin-card">
                 <div className="admin-card-title" style={{ marginBottom: 10 }}>
-                  {row.name ?? row[config.primaryKey]}
+                  {row[titleKey] ?? row[config.primaryKey]}
                 </div>
                 {config.listColumns
-                  .filter((c) => c !== "name")
+                  .filter((c) => c !== titleKey)
                   .map((col) => (
                     <div key={col} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, padding: "5px 0", borderTop: "1px solid var(--border)" }}>
                       <span style={{ color: "var(--muted)", textTransform: "capitalize" }}>{col.replace(/_/g, " ")}</span>
@@ -233,12 +250,13 @@ export function CrudTable({ config }: { config: TableConfig }) {
                   {f.label}
                   {f.required && " *"}
                 </label>
-                {f.type === "textarea" ? (
+                {f.type === "textarea" || f.type === "lines" ? (
                   <textarea
                     required={f.required}
+                    placeholder={f.placeholder}
                     value={formValues[f.key] ?? ""}
                     onChange={(e) => setFormValues((v) => ({ ...v, [f.key]: e.target.value }))}
-                    rows={3}
+                    rows={f.type === "lines" ? 5 : 3}
                     className="admin-textarea"
                   />
                 ) : f.type === "select" ? (
