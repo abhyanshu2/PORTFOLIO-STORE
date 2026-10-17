@@ -67,13 +67,15 @@ export function rowToItem(r: DriftImageRow): DriftWallItem {
   };
 }
 
-export function mapSettings(r: any): DriftSettings {
+type SettingsRow = Partial<Record<keyof DriftSettings, unknown>> | null | undefined;
+
+export function mapSettings(r: SettingsRow): DriftSettings {
   const d = DEFAULT_DRIFT_SETTINGS;
   if (!r) return d;
-  const num = (v: any, fallback: number) =>
+  const num = (v: unknown, fallback: number) =>
     v === null || v === undefined || Number.isNaN(Number(v)) ? fallback : Number(v);
   return {
-    enabled: r.enabled ?? d.enabled,
+    enabled: typeof r.enabled === "boolean" ? r.enabled : d.enabled,
     columns: num(r.columns, d.columns),
     tile_width: num(r.tile_width, d.tile_width),
     tile_height: num(r.tile_height, d.tile_height),

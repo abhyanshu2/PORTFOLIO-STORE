@@ -20,9 +20,9 @@
 :root,[data-theme="dark"]{
   --bg:#0a0a0a; --bg2:#111; --surface:#181818; --surface2:#202020;
   --border:rgba(255,255,255,0.07); --border-strong:rgba(255,255,255,0.14);
-  --text:#c0c0c0; --muted:#555; --muted2:#383838; --heading:#fff;
+  --text:#c0c0c0; --para:#b4b4b4; --muted:#939393; --muted2:#848484; --heading:#fff;
   --accent:#d4870a; --accent2:#f0a830; --accent-inv:#0a0a0a;
-  --tag-bg:#141414; --tag-border:rgba(212,135,10,0.22); --tag-text:#8a7040;
+  --tag-bg:#141414; --tag-border:rgba(212,135,10,0.22); --tag-text:#b8955a;
   --nav-bg:rgba(10,10,10,0.96); --grid-line:rgba(255,255,255,0.028);
   --marquee-bg:#0f0f0f; --proj-visual:#141414;
   --monogram-c:rgba(212,135,10,0.1); --glow:rgba(212,135,10,0.16);
@@ -34,9 +34,9 @@
 [data-theme="light"]{
   --bg:#efefed; --bg2:#e8e6e4; --surface:#dedad9; --surface2:#d4cfca;
   --border:rgba(60,40,10,0.08); --border-strong:rgba(60,40,10,0.14);
-  --text:#4a3f35; --muted:#7d6f63; --muted2:#9d8f7f; --heading:#2a1f15;
-  --accent:#b86800; --accent2:#d98a20; --accent-inv:#efefed;
-  --tag-bg:#dedad9; --tag-border:rgba(184,104,0,0.16); --tag-text:#7a6040;
+  --text:#4a3f35; --para:#4a3f35; --muted:#5e5247; --muted2:#67594b; --heading:#2a1f15;
+  --accent:#9a5600; --accent2:#b86800; --accent-inv:#efefed;
+  --tag-bg:#dedad9; --tag-border:rgba(154,86,0,0.22); --tag-text:#5f4a2c;
   --nav-bg:rgba(239,239,237,0.96); --grid-line:rgba(60,40,10,0.03);
   --marquee-bg:#e8e6e4; --proj-visual:#dedad9;
   --monogram-c:rgba(184,104,0,0.08); --glow:rgba(184,104,0,0.1);
@@ -1217,4 +1217,39 @@ html.store-wiping .portfolio-under{transition:none !important}
   .admin-login-title{font-size:22px}
   .admin-table-desktop{display:none}
   .admin-cards-mobile{display:block}
+}
+
+/* ══════════════════════════════════════════
+   READABILITY — clearer paragraph colour and
+   no tiny text (also on phones)
+══════════════════════════════════════════ */
+.hero-desc,.about-para,.skills-desc,.project-desc,.project-item-desc,.contact-sub{color:var(--para)}
+.hero-desc{font-size:16px;line-height:1.85}
+.about-para{font-size:16px;line-height:1.9}
+.skills-desc{font-size:15px}
+.project-desc{font-size:15px}
+.project-item-desc{font-size:14px;line-height:1.7}
+.contact-sub{font-size:15px}
+.edu-degree{font-size:15px}
+.edu-school{font-size:14px}
+.edu-year{font-size:12px}
+.edu-score{font-size:13px}
+.nav-links a{font-size:11px;letter-spacing:.14em}
+.section-label{font-size:11px;letter-spacing:.2em}
+.hero-number,.hero-badge,.project-badge{font-size:11px}
+.skill-card-label,.project-item-year,.contact-item-label{font-size:11px}
+.stat-label{font-size:10px;letter-spacing:.1em}
+.tag{font-size:11.5px}
+.project-item-link{font-size:11px}
+.scroll-indicator{font-size:10px}
+.footer-left,.footer-right{font-size:11px}
+.loader-sub{font-size:11px}
+.btn-primary,.btn-ghost,.proj-link{font-size:11px}
+@media(max-width:480px){
+  .hero-desc,.about-para{font-size:14px}
+  .skills-desc,.project-desc,.contact-sub{font-size:14px}
+  .project-item-desc,.edu-school{font-size:13px}
+  .section-label,.hero-number,.skill-card-label,.project-item-year,.contact-item-label,.footer-left,.footer-right{font-size:10px}
+  .stat-label{font-size:9px}
+  .tag{font-size:10.5px}
 }

@@ -142,8 +142,8 @@ const labelStyle: CSSProperties = {
   display: "block",
   marginBottom: 7,
   fontFamily: "'JetBrains Mono', monospace",
-  fontSize: 9,
-  letterSpacing: ".18em",
+  fontSize: 11,
+  letterSpacing: ".14em",
   textTransform: "uppercase",
   color: "var(--muted)",
 };

@@ -130,6 +130,7 @@ export function DriftPanel() {
 
   useEffect(() => {
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -161,8 +162,8 @@ export function DriftPanel() {
         if (err) throw err;
       }
       setNotice(`${list.length} photo${list.length > 1 ? "s" : ""} added`);
-    } catch (e: any) {
-      setError(explain(e?.message || "Upload failed"));
+    } catch (e) {
+      setError(explain(e instanceof Error ? e.message : "Upload failed"));
     } finally {
       setUploadInfo("");
       setBusy(null);
@@ -224,8 +225,8 @@ export function DriftPanel() {
     try {
       const url = await uploadMediaFile(await shrinkImage(files[0]));
       patch({ image_url: url });
-    } catch (e: any) {
-      setError(explain(e?.message || "Upload failed"));
+    } catch (e) {
+      setError(explain(e instanceof Error ? e.message : "Upload failed"));
     } finally {
       setReplacing(false);
       if (replaceRef.current) replaceRef.current.value = "";
@@ -733,7 +734,7 @@ export function DriftPanel() {
                     show: (v: number) => `${v.toFixed(2)}×`,
                   },
                 ].map((f) => {
-                  const value = Number((draft as any)[f.key]);
+                  const value = Number(draft[f.key as "height_scale" | "width_scale" | "zoom"]);
                   return (
                     <div className="admin-field" key={f.key}>
                       <div

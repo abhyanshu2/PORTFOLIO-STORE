@@ -52,7 +52,17 @@ export const FALLBACK_EXPERIENCE: ExperienceItem[] = [
   },
 ];
 
-function mapRow(r: any): ExperienceItem {
+type ExperienceRow = {
+  id: string | number;
+  role?: string | null;
+  place?: string | null;
+  dates?: string | null;
+  status?: string | null;
+  points?: string[] | null;
+  tags?: string[] | null;
+};
+
+function mapRow(r: ExperienceRow): ExperienceItem {
   return {
     id: String(r.id),
     role: r.role ?? "",

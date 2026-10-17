@@ -60,7 +60,7 @@ export function ContactSection() {
       }}
     >
       <div className="fade-up" style={{ marginBottom: 40 }}>
-        <div className="section-label">06 Contact</div>
+        <div className="section-label">06 — contact</div>
         <h2
           style={{
             fontFamily: "'Playfair Display', serif",
@@ -219,9 +219,9 @@ export function ContactSection() {
           flexWrap: "wrap",
           gap: 8,
           fontFamily: "'JetBrains Mono', monospace",
-          fontSize: 10,
-          letterSpacing: ".1em",
-          color: "var(--muted2)",
+          fontSize: 11,
+          letterSpacing: ".08em",
+          color: "var(--muted)",
         }}
       >
         <span>
@@ -243,8 +243,8 @@ const card: CSSProperties = {
 const label: CSSProperties = {
   marginBottom: 8,
   fontFamily: "'JetBrains Mono', monospace",
-  fontSize: 9,
-  letterSpacing: ".2em",
+  fontSize: 11,
+  letterSpacing: ".18em",
   textTransform: "uppercase",
   color: "var(--muted2)",
 };
