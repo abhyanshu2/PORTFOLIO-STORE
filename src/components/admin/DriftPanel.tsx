@@ -14,7 +14,8 @@ const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min)
 
 /** Shrinks big photos before upload so the homepage stays fast. */
 async function shrinkImage(file: File, maxSide = 1400): Promise<File> {
-  if (!file.type.startsWith("image/") || file.type === "image/gif" || file.type === "image/svg+xml") return file;
+  if (!file.type.startsWith("image/") || file.type === "image/gif" || file.type === "image/svg+xml")
+    return file;
   try {
     const bitmap = await createImageBitmap(file);
     const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
@@ -29,7 +30,9 @@ async function shrinkImage(file: File, maxSide = 1400): Promise<File> {
     if (!ctx) return file;
     ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
     bitmap.close();
-    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.86));
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, "image/jpeg", 0.86),
+    );
     if (!blob || blob.size >= file.size) return file;
     return new File([blob], file.name.replace(/\.\w+$/, "") + ".jpg", { type: "image/jpeg" });
   } catch {
@@ -52,7 +55,14 @@ function cropStyle(r: Pick<DriftImageRow, "fit" | "focus_x" | "focus_y" | "zoom"
   };
 }
 
-const SETTING_FIELDS: { key: keyof DriftSettings; label: string; min: number; max: number; step: number; unit?: string }[] = [
+const SETTING_FIELDS: {
+  key: keyof DriftSettings;
+  label: string;
+  min: number;
+  max: number;
+  step: number;
+  unit?: string;
+}[] = [
   { key: "columns", label: "Columns", min: 2, max: 8, step: 1 },
   { key: "tile_width", label: "Tile width", min: 120, max: 320, step: 5, unit: "px" },
   { key: "tile_height", label: "Tile height", min: 80, max: 240, step: 4, unit: "px" },
@@ -169,11 +179,17 @@ export function DriftPanel() {
     const next = [...rows];
     [next[index], next[target]] = [next[target], next[index]];
     const updates = next
-      .map((r, i) => ({ id: r.id, sort_order: (i + 1) * 10, changed: r.sort_order !== (i + 1) * 10 }))
+      .map((r, i) => ({
+        id: r.id,
+        sort_order: (i + 1) * 10,
+        changed: r.sort_order !== (i + 1) * 10,
+      }))
       .filter((u) => u.changed);
     setRows(next.map((r, i) => ({ ...r, sort_order: (i + 1) * 10 })));
     const results = await Promise.all(
-      updates.map((u) => supabase.from("drift_images").update({ sort_order: u.sort_order }).eq("id", u.id)),
+      updates.map((u) =>
+        supabase.from("drift_images").update({ sort_order: u.sort_order }).eq("id", u.id),
+      ),
     );
     const failed = results.find((r) => r.error);
     if (failed?.error) setError(explain(failed.error.message));
@@ -264,7 +280,8 @@ export function DriftPanel() {
   // size of the crop box in the edit window, same shape as a real tile
   const cropBox = useMemo(() => {
     if (!draft) return { w: 300, h: 200 };
-    const ratio = (settings.tile_width * draft.width_scale) / (settings.tile_height * draft.height_scale);
+    const ratio =
+      (settings.tile_width * draft.width_scale) / (settings.tile_height * draft.height_scale);
     const w = Math.min(340, 360 * ratio);
     return { w, h: w / ratio };
   }, [draft, settings.tile_width, settings.tile_height]);
@@ -286,7 +303,11 @@ export function DriftPanel() {
             style={{ display: "none" }}
             onChange={(e) => addFiles(e.target.files)}
           />
-          <button className="admin-btn-primary" disabled={busy === "upload"} onClick={() => fileRef.current?.click()}>
+          <button
+            className="admin-btn-primary"
+            disabled={busy === "upload"}
+            onClick={() => fileRef.current?.click()}
+          >
             {busy === "upload" ? "Uploading…" : "+ Add photos"}
           </button>
         </div>
@@ -334,7 +355,15 @@ export function DriftPanel() {
         {!loading && rows.length === 0 && (
           <div
             className="admin-empty"
-            style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", padding: 24 }}
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+              padding: 24,
+            }}
           >
             No photos yet. The homepage shows sample photos until you add your own.
           </div>
@@ -343,9 +372,26 @@ export function DriftPanel() {
 
       {/* wall settings */}
       <div style={card}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 12,
+            marginBottom: 16,
+          }}
+        >
           <div className="admin-card-title">Wall settings</div>
-          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer" }}>
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              fontSize: 13,
+              cursor: "pointer",
+            }}
+          >
             <input
               type="checkbox"
               checked={settings.enabled}
@@ -355,10 +401,23 @@ export function DriftPanel() {
             Show the wall on the homepage
           </label>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))", gap: "14px 28px" }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))",
+            gap: "14px 28px",
+          }}
+        >
           {SETTING_FIELDS.map((f) => (
             <div key={f.key}>
-              <div style={{ display: "flex", justifyContent: "space-between", ...smallLabel, marginBottom: 6 }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  ...smallLabel,
+                  marginBottom: 6,
+                }}
+              >
                 <span>{f.label}</span>
                 <span style={{ color: "var(--accent2)" }}>
                   {Number(settings[f.key])}
@@ -377,8 +436,20 @@ export function DriftPanel() {
             </div>
           ))}
         </div>
-        <div style={{ display: "flex", gap: 10, marginTop: 18, alignItems: "center", flexWrap: "wrap" }}>
-          <button className="admin-btn-primary" disabled={busy === "settings"} onClick={saveSettings}>
+        <div
+          style={{
+            display: "flex",
+            gap: 10,
+            marginTop: 18,
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <button
+            className="admin-btn-primary"
+            disabled={busy === "settings"}
+            onClick={saveSettings}
+          >
             {busy === "settings" ? "Saving…" : "Save settings"}
           </button>
           <button
@@ -390,7 +461,9 @@ export function DriftPanel() {
           >
             Reset to default
           </button>
-          {settingsDirty && <span style={{ ...smallLabel, color: "var(--accent2)" }}>Unsaved changes</span>}
+          {settingsDirty && (
+            <span style={{ ...smallLabel, color: "var(--accent2)" }}>Unsaved changes</span>
+          )}
         </div>
       </div>
 
@@ -401,9 +474,17 @@ export function DriftPanel() {
       {loading ? (
         <div className="admin-empty">Loading…</div>
       ) : rows.length === 0 ? (
-        <div className="admin-empty">Nothing here yet. Click “+ Add photos” and pick one or many images.</div>
+        <div className="admin-empty">
+          Nothing here yet. Click “+ Add photos” and pick one or many images.
+        </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 14 }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+            gap: 14,
+          }}
+        >
           {rows.map((row, i) => (
             <div key={row.id} className="admin-card" style={{ margin: 0, padding: 12 }}>
               <div
@@ -416,7 +497,12 @@ export function DriftPanel() {
                   marginBottom: 10,
                 }}
               >
-                <img src={row.image_url} alt={row.title ?? ""} style={cropStyle(row)} draggable={false} />
+                <img
+                  src={row.image_url}
+                  alt={row.title ?? ""}
+                  style={cropStyle(row)}
+                  draggable={false}
+                />
                 <span
                   style={{
                     position: "absolute",
@@ -433,17 +519,32 @@ export function DriftPanel() {
                   #{i + 1}
                 </span>
               </div>
-              <div style={{ fontSize: 13, color: "var(--heading)", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: "var(--heading)",
+                  fontWeight: 600,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
                 {row.title || "Untitled"}
               </div>
               <div style={{ ...smallLabel, margin: "4px 0 10px" }}>
-                Col {row.col_index ?? "auto"} · H {Number(row.height_scale).toFixed(2)}× · W {Math.round(Number(row.width_scale) * 100)}%
+                Col {row.col_index ?? "auto"} · H {Number(row.height_scale).toFixed(2)}× · W{" "}
+                {Math.round(Number(row.width_scale) * 100)}%
               </div>
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                 <button className="admin-btn-small" onClick={() => setDraft({ ...row })}>
                   Edit
                 </button>
-                <button className="admin-btn-small" disabled={i === 0 || busy === "order"} onClick={() => move(i, -1)} title="Move earlier">
+                <button
+                  className="admin-btn-small"
+                  disabled={i === 0 || busy === "order"}
+                  onClick={() => move(i, -1)}
+                  title="Move earlier"
+                >
                   ↑
                 </button>
                 <button
@@ -466,12 +567,24 @@ export function DriftPanel() {
       {/* edit window */}
       {draft && (
         <div className="admin-overlay" onClick={() => !savingDraft && setDraft(null)}>
-          <div className="admin-modal" style={{ maxWidth: 820 }} onClick={(e) => e.stopPropagation()}>
+          <div
+            className="admin-modal"
+            style={{ maxWidth: 820 }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="admin-modal-title">Edit photo</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 28 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                gap: 28,
+              }}
+            >
               {/* crop area */}
               <div>
-                <div style={{ ...smallLabel, marginBottom: 8 }}>Crop — drag or click to choose the visible part</div>
+                <div style={{ ...smallLabel, marginBottom: 8 }}>
+                  Crop — drag or click to choose the visible part
+                </div>
                 <div
                   ref={cropRef}
                   onPointerDown={(e) => {
@@ -519,12 +632,25 @@ export function DriftPanel() {
                     style={{ display: "none" }}
                     onChange={(e) => replaceImage(e.target.files)}
                   />
-                  <button className="admin-btn-small" disabled={replacing} onClick={() => replaceRef.current?.click()}>
+                  <button
+                    className="admin-btn-small"
+                    disabled={replacing}
+                    onClick={() => replaceRef.current?.click()}
+                  >
                     {replacing ? "Uploading…" : "Replace photo"}
                   </button>
                   <button
                     className="admin-btn-small"
-                    onClick={() => patch({ fit: "cover", focus_x: 50, focus_y: 50, zoom: 1, height_scale: 1, width_scale: 1 })}
+                    onClick={() =>
+                      patch({
+                        fit: "cover",
+                        focus_x: 50,
+                        focus_y: 50,
+                        zoom: 1,
+                        height_scale: 1,
+                        width_scale: 1,
+                      })
+                    }
                   >
                     Reset crop & size
                   </button>
@@ -535,7 +661,11 @@ export function DriftPanel() {
               <div>
                 <div className="admin-field">
                   <label className="admin-label">Title</label>
-                  <input className="admin-input" value={draft.title ?? ""} onChange={(e) => patch({ title: e.target.value })} />
+                  <input
+                    className="admin-input"
+                    value={draft.title ?? ""}
+                    onChange={(e) => patch({ title: e.target.value })}
+                  />
                 </div>
                 <div className="admin-field">
                   <label className="admin-label">Link (optional, opens when clicked)</label>
@@ -552,7 +682,9 @@ export function DriftPanel() {
                     <select
                       className="admin-select"
                       value={draft.col_index ?? ""}
-                      onChange={(e) => patch({ col_index: e.target.value === "" ? null : Number(e.target.value) })}
+                      onChange={(e) =>
+                        patch({ col_index: e.target.value === "" ? null : Number(e.target.value) })
+                      }
                     >
                       <option value="">Auto</option>
                       {Array.from({ length: settings.columns }, (_, i) => (
@@ -576,14 +708,42 @@ export function DriftPanel() {
                 </div>
 
                 {[
-                  { key: "height_scale", label: "Height", min: 0.5, max: 2.5, step: 0.05, show: (v: number) => `${v.toFixed(2)}×` },
-                  { key: "width_scale", label: "Width", min: 0.5, max: 1, step: 0.05, show: (v: number) => `${Math.round(v * 100)}%` },
-                  { key: "zoom", label: "Zoom", min: 1, max: 3, step: 0.05, show: (v: number) => `${v.toFixed(2)}×` },
+                  {
+                    key: "height_scale",
+                    label: "Height",
+                    min: 0.5,
+                    max: 2.5,
+                    step: 0.05,
+                    show: (v: number) => `${v.toFixed(2)}×`,
+                  },
+                  {
+                    key: "width_scale",
+                    label: "Width",
+                    min: 0.5,
+                    max: 1,
+                    step: 0.05,
+                    show: (v: number) => `${Math.round(v * 100)}%`,
+                  },
+                  {
+                    key: "zoom",
+                    label: "Zoom",
+                    min: 1,
+                    max: 3,
+                    step: 0.05,
+                    show: (v: number) => `${v.toFixed(2)}×`,
+                  },
                 ].map((f) => {
                   const value = Number((draft as any)[f.key]);
                   return (
                     <div className="admin-field" key={f.key}>
-                      <div style={{ display: "flex", justifyContent: "space-between", ...smallLabel, marginBottom: 6 }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          ...smallLabel,
+                          marginBottom: 6,
+                        }}
+                      >
                         <span>{f.label}</span>
                         <span style={{ color: "var(--accent2)" }}>{f.show(value)}</span>
                       </div>
@@ -593,7 +753,9 @@ export function DriftPanel() {
                         max={f.max}
                         step={f.step}
                         value={value}
-                        onChange={(e) => patch({ [f.key]: Number(e.target.value) } as Partial<DriftImageRow>)}
+                        onChange={(e) =>
+                          patch({ [f.key]: Number(e.target.value) } as Partial<DriftImageRow>)
+                        }
                         style={{ width: "100%", accentColor: "var(--accent)" }}
                       />
                     </div>
@@ -603,10 +765,18 @@ export function DriftPanel() {
             </div>
 
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 8 }}>
-              <button className="admin-btn-ghost" disabled={savingDraft} onClick={() => setDraft(null)}>
+              <button
+                className="admin-btn-ghost"
+                disabled={savingDraft}
+                onClick={() => setDraft(null)}
+              >
                 Cancel
               </button>
-              <button className="admin-btn-primary" disabled={savingDraft || replacing} onClick={saveDraft}>
+              <button
+                className="admin-btn-primary"
+                disabled={savingDraft || replacing}
+                onClick={saveDraft}
+              >
                 {savingDraft ? "Saving…" : "Save photo"}
               </button>
             </div>

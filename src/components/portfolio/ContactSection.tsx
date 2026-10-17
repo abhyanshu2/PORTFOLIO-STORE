@@ -20,7 +20,12 @@ function useLocalTime() {
   useEffect(() => {
     const update = () =>
       setTime(
-        new Intl.DateTimeFormat("en-IN", { timeZone: "Asia/Kolkata", hour: "numeric", minute: "2-digit", hour12: true })
+        new Intl.DateTimeFormat("en-IN", {
+          timeZone: "Asia/Kolkata",
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+        })
           .format(new Date())
           .toUpperCase(),
       );
@@ -69,7 +74,15 @@ export function ContactSection() {
         >
           Let's Work Together
         </h2>
-        <p style={{ fontSize: 14, color: "var(--muted)", maxWidth: 520, lineHeight: 1.85, fontWeight: 400 }}>
+        <p
+          style={{
+            fontSize: 14,
+            color: "var(--muted)",
+            maxWidth: 520,
+            lineHeight: 1.85,
+            fontWeight: 400,
+          }}
+        >
           Open to full-stack internships, frontend roles, freelance UI/UX work and collaborations.
         </p>
       </div>
@@ -86,14 +99,28 @@ export function ContactSection() {
         <ContactForm />
 
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+          <div
+            style={{
+              ...card,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 12,
+              flexWrap: "wrap",
+            }}
+          >
             <div>
               <div style={label}>Email</div>
               <a href={`mailto:${EMAIL}`} style={{ ...value, textDecoration: "none" }}>
                 {EMAIL}
               </a>
             </div>
-            <button type="button" onClick={copyEmail} className="btn-ghost" style={{ padding: "8px 16px" }}>
+            <button
+              type="button"
+              onClick={copyEmail}
+              className="btn-ghost"
+              style={{ padding: "8px 16px" }}
+            >
               {copied ? "Copied ✓" : "Copy"}
             </button>
           </div>
@@ -102,19 +129,40 @@ export function ContactSection() {
             <div style={label}>Socials</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "8px 22px", marginTop: 4 }}>
               {SOCIALS.map((s) => (
-                <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" className="contact-item-val" style={{ fontSize: 13 }}>
+                <a
+                  key={s.label}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="contact-item-val"
+                  style={{ fontSize: 13 }}
+                >
                   {s.label}
                 </a>
               ))}
             </div>
           </div>
 
-          <div style={{ ...card, borderColor: "var(--tag-border)", background: "color-mix(in oklab, var(--accent) 7%, var(--surface))" }}>
+          <div
+            style={{
+              ...card,
+              borderColor: "var(--tag-border)",
+              background: "color-mix(in oklab, var(--accent) 7%, var(--surface))",
+            }}
+          >
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
               <span className="badge-dot" />
               <span style={{ ...label, color: "#6ab04c", margin: 0 }}>Available</span>
             </div>
-            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 21, fontWeight: 700, color: "var(--heading)", marginBottom: 8 }}>
+            <div
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: 21,
+                fontWeight: 700,
+                color: "var(--heading)",
+                marginBottom: 8,
+              }}
+            >
               Open to new opportunities
             </div>
             <div style={{ fontSize: 12, color: "var(--muted)", lineHeight: 1.7 }}>

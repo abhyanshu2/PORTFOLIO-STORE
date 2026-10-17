@@ -58,7 +58,9 @@ const noise = (seed: number): number => {
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 const nextFrames = () =>
-  new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+  new Promise<void>((resolve) =>
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+  );
 
 type Cell = { left: number; top: number; width: number; height: number; offset: number };
 
@@ -135,7 +137,8 @@ export const PixelWipe = forwardRef<PixelWipeHandle, Props>(function PixelWipe(
     run: async ({ color, onCover }) => {
       const root = rootRef.current;
       const reduceMotion =
-        typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
       if (!root || reduceMotion) {
         onCover?.();
@@ -145,7 +148,14 @@ export const PixelWipe = forwardRef<PixelWipeHandle, Props>(function PixelWipe(
       cancelAll();
       const runId = ++runIdRef.current;
 
-      const cells = buildCells(window.innerWidth, window.innerHeight, pixelSize, pattern, randomness, maxPixels);
+      const cells = buildCells(
+        window.innerWidth,
+        window.innerHeight,
+        pixelSize,
+        pattern,
+        randomness,
+        maxPixels,
+      );
       const total = Math.max(200, duration);
       const pixelMs = clamp(pixelDuration, 60, total);
       const spread = Math.max(0, total - pixelMs);
@@ -208,7 +218,13 @@ export const PixelWipe = forwardRef<PixelWipeHandle, Props>(function PixelWipe(
     <div
       ref={rootRef}
       aria-hidden="true"
-      style={{ position: "fixed", inset: 0, zIndex: 8999, pointerEvents: "none", overflow: "hidden" }}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 8999,
+        pointerEvents: "none",
+        overflow: "hidden",
+      }}
     />
   );
 });

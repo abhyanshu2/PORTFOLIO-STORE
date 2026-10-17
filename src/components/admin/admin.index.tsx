@@ -45,7 +45,14 @@ function AdminDashboardPage() {
   if (!isAdmin) return <FullscreenMsg text="Redirecting to login…" />;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0a0a0a", color: "#f5f2ec", fontFamily: "'Space Grotesk', sans-serif" }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#0a0a0a",
+        color: "#f5f2ec",
+        fontFamily: "'Space Grotesk', sans-serif",
+      }}
+    >
       <header
         style={{
           display: "flex",

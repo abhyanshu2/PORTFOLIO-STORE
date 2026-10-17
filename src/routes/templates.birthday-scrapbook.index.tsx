@@ -23,9 +23,6 @@ export const Route = createFileRoute("/templates/birthday-scrapbook/")({
   component: CollagePage,
 });
 
-
-
-
 function CollagePage() {
   const desktop = useDesktopPinning();
 

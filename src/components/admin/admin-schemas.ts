@@ -26,7 +26,13 @@ export const TEMPLATES_CONFIG: TableConfig = {
   primaryKey: "id",
   orderBy: "sort_order",
   fields: [
-    { key: "id", label: "ID (slug)", type: "text", required: true, placeholder: "e.g. birthday-scrapbook" },
+    {
+      key: "id",
+      label: "ID (slug)",
+      type: "text",
+      required: true,
+      placeholder: "e.g. birthday-scrapbook",
+    },
     { key: "name", label: "Name", type: "text", required: true },
     { key: "monogram", label: "Monogram", type: "text", required: true, placeholder: "e.g. BS" },
     {
@@ -39,7 +45,12 @@ export const TEMPLATES_CONFIG: TableConfig = {
     { key: "description", label: "Description", type: "textarea", required: true },
     { key: "features", label: "Features (comma separated)", type: "array" },
     { key: "price", label: "Price (₹)", type: "number", required: true },
-    { key: "badge", label: "Badge", type: "select", options: ["", "trending", "new", "bestseller", "premium"] },
+    {
+      key: "badge",
+      label: "Badge",
+      type: "select",
+      options: ["", "trending", "new", "bestseller", "premium"],
+    },
     { key: "screenshots", label: "Screenshots (comma separated)", type: "array" },
     { key: "demo_url", label: "Demo URL", type: "url" },
     { key: "sort_order", label: "Sort Order", type: "number" },
@@ -92,7 +103,13 @@ export const SERVICES_CONFIG: TableConfig = {
   primaryKey: "id",
   orderBy: "sort_order",
   fields: [
-    { key: "id", label: "ID (slug)", type: "text", required: true, placeholder: "e.g. portfolio-dev" },
+    {
+      key: "id",
+      label: "ID (slug)",
+      type: "text",
+      required: true,
+      placeholder: "e.g. portfolio-dev",
+    },
     { key: "name", label: "Name", type: "text", required: true },
     { key: "description", label: "Description", type: "textarea", required: true },
     { key: "price", label: "Price label", type: "text", placeholder: "from ₹4,999" },

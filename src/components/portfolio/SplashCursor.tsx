@@ -101,7 +101,10 @@ export function SplashCursor({
     const isWebGL2 = !!gl;
     if (!gl) {
       gl = (canvas.getContext("webgl", params) ||
-        canvas.getContext("experimental-webgl", params)) as unknown as WebGL2RenderingContext | null;
+        canvas.getContext(
+          "experimental-webgl",
+          params,
+        )) as unknown as WebGL2RenderingContext | null;
     }
     if (!gl) return;
     const g = gl;
@@ -196,7 +199,8 @@ export function SplashCursor({
       g.attachShader(program, vertexShader);
       g.attachShader(program, fragmentShader);
       g.linkProgram(program);
-      if (!g.getProgramParameter(program, g.LINK_STATUS)) console.warn(g.getProgramInfoLog(program));
+      if (!g.getProgramParameter(program, g.LINK_STATUS))
+        console.warn(g.getProgramInfoLog(program));
       return program;
     }
 
@@ -224,7 +228,11 @@ export function SplashCursor({
         for (const k of keywords) hash += hashCode(k);
         let program = this.programs[hash];
         if (program == null) {
-          const fragmentShader = compileShader(g.FRAGMENT_SHADER, this.fragmentShaderSource, keywords);
+          const fragmentShader = compileShader(
+            g.FRAGMENT_SHADER,
+            this.fragmentShaderSource,
+            keywords,
+          );
           program = createProgram(this.vertexShader, fragmentShader);
           this.programs[hash] = program;
         }
@@ -495,7 +503,14 @@ export function SplashCursor({
       };
     })();
 
-    function createFBO(w: number, h: number, internalFormat: number, format: number, type: number, param: number): FBO {
+    function createFBO(
+      w: number,
+      h: number,
+      internalFormat: number,
+      format: number,
+      type: number,
+      param: number,
+    ): FBO {
       g.activeTexture(g.TEXTURE0);
       const texture = g.createTexture();
       g.bindTexture(g.TEXTURE_2D, texture);
@@ -559,7 +574,15 @@ export function SplashCursor({
       };
     }
 
-    function resizeFBO(target: FBO, w: number, h: number, internalFormat: number, format: number, type: number, param: number) {
+    function resizeFBO(
+      target: FBO,
+      w: number,
+      h: number,
+      internalFormat: number,
+      format: number,
+      type: number,
+      param: number,
+    ) {
       const newFBO = createFBO(w, h, internalFormat, format, type, param);
       copyProgram.bind();
       g.uniform1i(copyProgram.uniforms["uTexture"]!, target.attach(0));
@@ -608,7 +631,9 @@ export function SplashCursor({
       if (aspectRatio < 1) aspectRatio = 1 / aspectRatio;
       const min = Math.round(resolution);
       const max = Math.round(resolution * aspectRatio);
-      return g.drawingBufferWidth > g.drawingBufferHeight ? { width: max, height: min } : { width: min, height: max };
+      return g.drawingBufferWidth > g.drawingBufferHeight
+        ? { width: max, height: min }
+        : { width: min, height: max };
     }
 
     function initFramebuffers() {
@@ -622,14 +647,65 @@ export function SplashCursor({
       g.disable(g.BLEND);
 
       dye = !dye
-        ? createDoubleFBO(dyeRes.width, dyeRes.height, rgba.internalFormat, rgba.format, texType, filtering)
-        : resizeDoubleFBO(dye, dyeRes.width, dyeRes.height, rgba.internalFormat, rgba.format, texType, filtering);
+        ? createDoubleFBO(
+            dyeRes.width,
+            dyeRes.height,
+            rgba.internalFormat,
+            rgba.format,
+            texType,
+            filtering,
+          )
+        : resizeDoubleFBO(
+            dye,
+            dyeRes.width,
+            dyeRes.height,
+            rgba.internalFormat,
+            rgba.format,
+            texType,
+            filtering,
+          );
       velocity = !velocity
-        ? createDoubleFBO(simRes.width, simRes.height, rg.internalFormat, rg.format, texType, filtering)
-        : resizeDoubleFBO(velocity, simRes.width, simRes.height, rg.internalFormat, rg.format, texType, filtering);
-      divergence = createFBO(simRes.width, simRes.height, r.internalFormat, r.format, texType, g.NEAREST);
-      curlFBO = createFBO(simRes.width, simRes.height, r.internalFormat, r.format, texType, g.NEAREST);
-      pressure = createDoubleFBO(simRes.width, simRes.height, r.internalFormat, r.format, texType, g.NEAREST);
+        ? createDoubleFBO(
+            simRes.width,
+            simRes.height,
+            rg.internalFormat,
+            rg.format,
+            texType,
+            filtering,
+          )
+        : resizeDoubleFBO(
+            velocity,
+            simRes.width,
+            simRes.height,
+            rg.internalFormat,
+            rg.format,
+            texType,
+            filtering,
+          );
+      divergence = createFBO(
+        simRes.width,
+        simRes.height,
+        r.internalFormat,
+        r.format,
+        texType,
+        g.NEAREST,
+      );
+      curlFBO = createFBO(
+        simRes.width,
+        simRes.height,
+        r.internalFormat,
+        r.format,
+        texType,
+        g.NEAREST,
+      );
+      pressure = createDoubleFBO(
+        simRes.width,
+        simRes.height,
+        r.internalFormat,
+        r.format,
+        texType,
+        g.NEAREST,
+      );
     }
 
     displayMaterial.setKeywords(config.SHADING ? ["SHADING"] : []);
@@ -698,7 +774,13 @@ export function SplashCursor({
     }
 
     function splatPointer(p: Pointer) {
-      splat(p.texcoordX, p.texcoordY, p.deltaX * config.SPLAT_FORCE, p.deltaY * config.SPLAT_FORCE, p.color);
+      splat(
+        p.texcoordX,
+        p.texcoordY,
+        p.deltaX * config.SPLAT_FORCE,
+        p.deltaY * config.SPLAT_FORCE,
+        p.color,
+      );
     }
 
     function clickSplat(p: Pointer) {
@@ -720,7 +802,11 @@ export function SplashCursor({
       blit(curlFBO);
 
       vorticityProgram.bind();
-      g.uniform2f(vorticityProgram.uniforms["texelSize"]!, velocity.texelSizeX, velocity.texelSizeY);
+      g.uniform2f(
+        vorticityProgram.uniforms["texelSize"]!,
+        velocity.texelSizeX,
+        velocity.texelSizeY,
+      );
       g.uniform1i(vorticityProgram.uniforms["uVelocity"]!, velocity.read.attach(0));
       g.uniform1i(vorticityProgram.uniforms["uCurl"]!, curlFBO.attach(1));
       g.uniform1f(vorticityProgram.uniforms["curl"]!, config.CURL);
@@ -729,7 +815,11 @@ export function SplashCursor({
       velocity.swap();
 
       divergenceProgram.bind();
-      g.uniform2f(divergenceProgram.uniforms["texelSize"]!, velocity.texelSizeX, velocity.texelSizeY);
+      g.uniform2f(
+        divergenceProgram.uniforms["texelSize"]!,
+        velocity.texelSizeX,
+        velocity.texelSizeY,
+      );
       g.uniform1i(divergenceProgram.uniforms["uVelocity"]!, velocity.read.attach(0));
       blit(divergence);
 
@@ -749,16 +839,28 @@ export function SplashCursor({
       }
 
       gradienSubtractProgram.bind();
-      g.uniform2f(gradienSubtractProgram.uniforms["texelSize"]!, velocity.texelSizeX, velocity.texelSizeY);
+      g.uniform2f(
+        gradienSubtractProgram.uniforms["texelSize"]!,
+        velocity.texelSizeX,
+        velocity.texelSizeY,
+      );
       g.uniform1i(gradienSubtractProgram.uniforms["uPressure"]!, pressure.read.attach(0));
       g.uniform1i(gradienSubtractProgram.uniforms["uVelocity"]!, velocity.read.attach(1));
       blit(velocity.write);
       velocity.swap();
 
       advectionProgram.bind();
-      g.uniform2f(advectionProgram.uniforms["texelSize"]!, velocity.texelSizeX, velocity.texelSizeY);
+      g.uniform2f(
+        advectionProgram.uniforms["texelSize"]!,
+        velocity.texelSizeX,
+        velocity.texelSizeY,
+      );
       if (!supportLinearFiltering)
-        g.uniform2f(advectionProgram.uniforms["dyeTexelSize"]!, velocity.texelSizeX, velocity.texelSizeY);
+        g.uniform2f(
+          advectionProgram.uniforms["dyeTexelSize"]!,
+          velocity.texelSizeX,
+          velocity.texelSizeY,
+        );
       const velocityId = velocity.read.attach(0);
       g.uniform1i(advectionProgram.uniforms["uVelocity"]!, velocityId);
       g.uniform1i(advectionProgram.uniforms["uSource"]!, velocityId);
@@ -782,7 +884,11 @@ export function SplashCursor({
       g.enable(g.BLEND);
       displayMaterial.bind();
       if (config.SHADING)
-        g.uniform2f(displayMaterial.uniforms["texelSize"]!, 1 / g.drawingBufferWidth, 1 / g.drawingBufferHeight);
+        g.uniform2f(
+          displayMaterial.uniforms["texelSize"]!,
+          1 / g.drawingBufferWidth,
+          1 / g.drawingBufferHeight,
+        );
       g.uniform1i(displayMaterial.uniforms["uTexture"]!, dye.read.attach(0));
       blit(null);
     }
@@ -895,7 +1001,12 @@ export function SplashCursor({
     const onTouchMove = (e: TouchEvent) => {
       const p = pointers[0]!;
       for (const t of Array.from(e.targetTouches)) {
-        updatePointerMoveData(p, scaleByPixelRatio(t.clientX), scaleByPixelRatio(t.clientY), p.color);
+        updatePointerMoveData(
+          p,
+          scaleByPixelRatio(t.clientX),
+          scaleByPixelRatio(t.clientY),
+          p.color,
+        );
       }
     };
 

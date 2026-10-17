@@ -12,7 +12,8 @@ export function ExperienceSection() {
       <div className="fade-up">
         <div className="section-label">04 Experience</div>
         <h2 className="education-title" style={{ marginBottom: 20 }}>
-          WORK<br />
+          WORK
+          <br />
           <em style={{ fontStyle: "italic", color: "var(--muted)" }}>Experience</em>
         </h2>
         <p style={{ fontSize: 14, color: "var(--muted)", fontWeight: 400, marginBottom: 48 }}>
@@ -24,7 +25,15 @@ export function ExperienceSection() {
         {items.map((item) => (
           <article key={item.id} style={row}>
             <div style={{ flex: "1 1 420px", minWidth: 0 }}>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap", marginBottom: 6 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "baseline",
+                  gap: 12,
+                  flexWrap: "wrap",
+                  marginBottom: 6,
+                }}
+              >
                 <h3 style={roleStyle}>{item.role}</h3>
                 {item.current && <span style={currentBadge}>Current</span>}
               </div>
@@ -82,7 +91,14 @@ const placeStyle: CSSProperties = {
   color: "var(--muted)",
   marginBottom: 16,
 };
-const list: CSSProperties = { listStyle: "none", margin: "0 0 20px", padding: 0, display: "flex", flexDirection: "column", gap: 10 };
+const list: CSSProperties = {
+  listStyle: "none",
+  margin: "0 0 20px",
+  padding: 0,
+  display: "flex",
+  flexDirection: "column",
+  gap: 10,
+};
 const listItem: CSSProperties = {
   display: "flex",
   alignItems: "flex-start",

@@ -10,7 +10,12 @@ import { SERVICES, type Service } from "@/data/store/services";
  * or the table is empty, this silently keeps using the bundled static data —
  * the store never breaks or shows blank sections because of a backend hiccup.
  */
-function useSupabaseTable<T>(table: string, orderBy: string, mapRow: (row: any) => T, fallback: T[]) {
+function useSupabaseTable<T>(
+  table: string,
+  orderBy: string,
+  mapRow: (row: any) => T,
+  fallback: T[],
+) {
   const [data, setData] = useState<T[]>(fallback);
   const [loading, setLoading] = useState(true);
 
@@ -55,7 +60,7 @@ export function useTemplates() {
       images: r.gallery_image_urls?.length ? r.gallery_image_urls : undefined,
       videoUrl: r.video_url || undefined,
     }),
-    TEMPLATES
+    TEMPLATES,
   );
 }
 
@@ -74,7 +79,7 @@ export function useMyProducts() {
       liveUrl: r.live_url || undefined,
       learnMoreUrl: r.learn_more_url || undefined,
     }),
-    MY_PRODUCTS
+    MY_PRODUCTS,
   );
 }
 
@@ -83,7 +88,7 @@ export function useResources() {
     "resources",
     "sort_order",
     (r) => ({ id: r.id, name: r.name, description: r.description, url: r.url, type: r.type }),
-    RESOURCES
+    RESOURCES,
   );
 }
 
@@ -91,8 +96,14 @@ export function useServices() {
   return useSupabaseTable<Service>(
     "services",
     "sort_order",
-    (r) => ({ id: r.id, name: r.name, description: r.description, price: r.price, features: r.features ?? [] }),
-    SERVICES
+    (r) => ({
+      id: r.id,
+      name: r.name,
+      description: r.description,
+      price: r.price,
+      features: r.features ?? [],
+    }),
+    SERVICES,
   );
 }
 
@@ -167,6 +178,6 @@ export function useProjects() {
       monogram: r.monogram || undefined,
       featured: !!r.featured,
     }),
-    FALLBACK_PROJECTS
+    FALLBACK_PROJECTS,
   );
 }

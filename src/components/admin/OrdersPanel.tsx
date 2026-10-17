@@ -47,7 +47,10 @@ export function OrdersPanel() {
   return (
     <div>
       <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>
-        Orders <span style={{ color: "rgba(245,242,236,0.4)", fontWeight: 400, fontSize: 13 }}>({rows.length})</span>
+        Orders{" "}
+        <span style={{ color: "rgba(245,242,236,0.4)", fontWeight: 400, fontSize: 13 }}>
+          ({rows.length})
+        </span>
       </h2>
       {error && <div style={{ color: "#ff6b6b", fontSize: 13, marginBottom: 12 }}>{error}</div>}
       {loading ? (
@@ -60,7 +63,14 @@ export function OrdersPanel() {
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {rows.map((o) => (
             <div key={o.id} style={cardStyle}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: 12,
+                  flexWrap: "wrap",
+                }}
+              >
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 14 }}>{o.item_name}</div>
                   <div style={{ fontSize: 11, color: "rgba(245,242,236,0.45)", marginTop: 3 }}>
@@ -73,8 +83,19 @@ export function OrdersPanel() {
                     </div>
                   )}
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-end" }}>
-                  <select value={o.status} onChange={(e) => updateStatus(o.id, e.target.value)} style={selectStyle}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 8,
+                    alignItems: "flex-end",
+                  }}
+                >
+                  <select
+                    value={o.status}
+                    onChange={(e) => updateStatus(o.id, e.target.value)}
+                    style={selectStyle}
+                  >
                     <option value="new">New</option>
                     <option value="contacted">Contacted</option>
                     <option value="closed">Closed</option>

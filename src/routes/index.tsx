@@ -11,9 +11,16 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Abhyanshu Raj — Frontend Developer" },
-      { name: "description", content: "Portfolio and premium digital store by Abhyanshu Raj — React, Next.js templates, apps, free resources, and services." },
+      {
+        name: "description",
+        content:
+          "Portfolio and premium digital store by Abhyanshu Raj — React, Next.js templates, apps, free resources, and services.",
+      },
       { property: "og:title", content: "Abhyanshu Raj — Frontend Developer" },
-      { property: "og:description", content: "Portfolio and premium digital store — templates, apps, resources, and services." },
+      {
+        property: "og:description",
+        content: "Portfolio and premium digital store — templates, apps, resources, and services.",
+      },
     ],
   }),
   component: Index,
@@ -36,7 +43,6 @@ function Index() {
         COLOR="#ed7520"
       />
       <div className={`portfolio-under${storeOpen ? " blurred" : ""}`} aria-hidden={storeOpen}>
-
         <Portfolio onOpenStore={() => setStoreOpen(true)} />
       </div>
       <Suspense fallback={null}>

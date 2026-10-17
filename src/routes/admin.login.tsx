@@ -85,7 +85,12 @@ function AdminLoginPage() {
 
         {error && <p className="admin-error">{error}</p>}
 
-        <button type="submit" disabled={loading} className="admin-btn-primary" style={{ width: "100%", marginTop: 6 }}>
+        <button
+          type="submit"
+          disabled={loading}
+          className="admin-btn-primary"
+          style={{ width: "100%", marginTop: 6 }}
+        >
           {loading ? "Signing in…" : "Sign In"}
         </button>
       </form>

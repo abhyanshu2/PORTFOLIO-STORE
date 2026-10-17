@@ -44,7 +44,9 @@ export const DEFAULT_DRIFT_SETTINGS: DriftSettings = {
 };
 
 // Shown until real photos are added from the admin panel
-const SAMPLE_IDS = [1015, 1025, 1039, 1043, 1044, 1050, 1062, 1069, 1074, 1080, 1084, 106, 110, 133, 164];
+const SAMPLE_IDS = [
+  1015, 1025, 1039, 1043, 1044, 1050, 1062, 1069, 1074, 1080, 1084, 106, 110, 133, 164,
+];
 export const SAMPLE_DRIFT_ITEMS: DriftWallItem[] = SAMPLE_IDS.map((id, i) => ({
   image: `https://picsum.photos/id/${id}/600/400`,
   title: `Photo ${i + 1}`,
@@ -68,7 +70,8 @@ export function rowToItem(r: DriftImageRow): DriftWallItem {
 export function mapSettings(r: any): DriftSettings {
   const d = DEFAULT_DRIFT_SETTINGS;
   if (!r) return d;
-  const num = (v: any, fallback: number) => (v === null || v === undefined || Number.isNaN(Number(v)) ? fallback : Number(v));
+  const num = (v: any, fallback: number) =>
+    v === null || v === undefined || Number.isNaN(Number(v)) ? fallback : Number(v);
   return {
     enabled: r.enabled ?? d.enabled,
     columns: num(r.columns, d.columns),
@@ -91,7 +94,11 @@ export function mapSettings(r: any): DriftSettings {
  * with the right photos (no flash of sample photos first).
  */
 export function useDriftWall() {
-  const [state, setState] = useState<{ ready: boolean; items: DriftWallItem[]; settings: DriftSettings }>({
+  const [state, setState] = useState<{
+    ready: boolean;
+    items: DriftWallItem[];
+    settings: DriftSettings;
+  }>({
     ready: false,
     items: SAMPLE_DRIFT_ITEMS,
     settings: DEFAULT_DRIFT_SETTINGS,

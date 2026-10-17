@@ -83,7 +83,8 @@ export const TEMPLATES: Template[] = [
     name: "The Ring Box",
     monogram: "RB",
     category: "proposal",
-    description: "Elegant animated ring-box opening reveal leading into a heartfelt proposal message.",
+    description:
+      "Elegant animated ring-box opening reveal leading into a heartfelt proposal message.",
     features: ["Box-open animation", "Custom message", "Music slot", "Mobile-first"],
     price: 299,
     badge: "premium",
@@ -140,7 +141,8 @@ export const TEMPLATES: Template[] = [
     name: "Paper Heart",
     monogram: "PH",
     category: "sorry",
-    description: "Gentle animated sorry page with a torn-paper-heart-mending effect and heartfelt note.",
+    description:
+      "Gentle animated sorry page with a torn-paper-heart-mending effect and heartfelt note.",
     features: ["Mending animation", "Custom message", "Music slot", "Mobile-first"],
     price: 149,
     badge: "trending",

@@ -335,9 +335,17 @@ export function PhotoFrame({
           onPointerCancel={onSizeUp}
           onKeyDown={(e) => {
             if (e.key === "ArrowUp" || e.key === "ArrowRight")
-              setPin(id, { x: freePin?.x ?? 0, y: freePin?.y ?? 0, s: clamp(frameScale + 0.05, 0.5, 2.5) });
+              setPin(id, {
+                x: freePin?.x ?? 0,
+                y: freePin?.y ?? 0,
+                s: clamp(frameScale + 0.05, 0.5, 2.5),
+              });
             if (e.key === "ArrowDown" || e.key === "ArrowLeft")
-              setPin(id, { x: freePin?.x ?? 0, y: freePin?.y ?? 0, s: clamp(frameScale - 0.05, 0.5, 2.5) });
+              setPin(id, {
+                x: freePin?.x ?? 0,
+                y: freePin?.y ?? 0,
+                s: clamp(frameScale - 0.05, 0.5, 2.5),
+              });
           }}
           title="Drag to resize"
           style={{ touchAction: "none" }}

@@ -52,7 +52,10 @@ export function MessagesPanel() {
       {loading ? (
         <div className="admin-empty">Loading…</div>
       ) : rows.length === 0 ? (
-        <div className="admin-empty">No messages yet — these show up automatically when someone submits your portfolio's contact form.</div>
+        <div className="admin-empty">
+          No messages yet — these show up automatically when someone submits your portfolio's
+          contact form.
+        </div>
       ) : (
         <div>
           {rows.map((m) => (

@@ -1,4 +1,14 @@
-export type FieldType = "text" | "textarea" | "lines" | "number" | "url" | "select" | "array" | "image" | "video" | "image-array";
+export type FieldType =
+  | "text"
+  | "textarea"
+  | "lines"
+  | "number"
+  | "url"
+  | "select"
+  | "array"
+  | "image"
+  | "video"
+  | "image-array";
 
 export interface FieldConfig {
   key: string;
@@ -28,7 +38,13 @@ export const TEMPLATES_CONFIG: TableConfig = {
   primaryKey: "id",
   orderBy: "sort_order",
   fields: [
-    { key: "id", label: "ID (slug)", type: "text", required: true, placeholder: "e.g. birthday-scrapbook" },
+    {
+      key: "id",
+      label: "ID (slug)",
+      type: "text",
+      required: true,
+      placeholder: "e.g. birthday-scrapbook",
+    },
     { key: "name", label: "Name", type: "text", required: true },
     { key: "monogram", label: "Monogram", type: "text", required: true, placeholder: "e.g. BS" },
     {
@@ -41,7 +57,12 @@ export const TEMPLATES_CONFIG: TableConfig = {
     { key: "description", label: "Description", type: "textarea", required: true },
     { key: "features", label: "Features (comma separated)", type: "array" },
     { key: "price", label: "Price (₹)", type: "number", required: true },
-    { key: "badge", label: "Badge", type: "select", options: ["", "trending", "new", "bestseller", "premium"] },
+    {
+      key: "badge",
+      label: "Badge",
+      type: "select",
+      options: ["", "trending", "new", "bestseller", "premium"],
+    },
     { key: "screenshots", label: "Screenshots (comma separated)", type: "array" },
     { key: "cover_image_url", label: "Cover Image (shown on the card)", type: "image" },
     { key: "gallery_image_urls", label: "Gallery Images", type: "image-array" },
@@ -96,7 +117,13 @@ export const SERVICES_CONFIG: TableConfig = {
   primaryKey: "id",
   orderBy: "sort_order",
   fields: [
-    { key: "id", label: "ID (slug)", type: "text", required: true, placeholder: "e.g. portfolio-dev" },
+    {
+      key: "id",
+      label: "ID (slug)",
+      type: "text",
+      required: true,
+      placeholder: "e.g. portfolio-dev",
+    },
     { key: "name", label: "Name", type: "text", required: true },
     { key: "description", label: "Description", type: "textarea", required: true },
     { key: "price", label: "Price label", type: "text", placeholder: "from ₹4,999" },
@@ -132,11 +159,40 @@ export const EXPERIENCE_CONFIG: TableConfig = {
   orderBy: "sort_order",
   titleKey: "role",
   fields: [
-    { key: "role", label: "Role / title", type: "text", required: true, placeholder: "e.g. Full Stack Developer Intern" },
-    { key: "place", label: "Company or project", type: "text", required: true, placeholder: "e.g. Sysnet Global Technologies (P) Ltd" },
-    { key: "dates", label: "Dates (shown on the right)", type: "text", required: true, placeholder: "e.g. Jun 2026 – Present" },
-    { key: "status", label: "Status", type: "select", required: true, options: ["current", "past"] },
-    { key: "points", label: "What you did (one point per line)", type: "lines", placeholder: "Write each point on its own line" },
+    {
+      key: "role",
+      label: "Role / title",
+      type: "text",
+      required: true,
+      placeholder: "e.g. Full Stack Developer Intern",
+    },
+    {
+      key: "place",
+      label: "Company or project",
+      type: "text",
+      required: true,
+      placeholder: "e.g. Sysnet Global Technologies (P) Ltd",
+    },
+    {
+      key: "dates",
+      label: "Dates (shown on the right)",
+      type: "text",
+      required: true,
+      placeholder: "e.g. Jun 2026 – Present",
+    },
+    {
+      key: "status",
+      label: "Status",
+      type: "select",
+      required: true,
+      options: ["current", "past"],
+    },
+    {
+      key: "points",
+      label: "What you did (one point per line)",
+      type: "lines",
+      placeholder: "Write each point on its own line",
+    },
     { key: "tags", label: "Tech / skills (comma separated)", type: "array" },
     { key: "sort_order", label: "Sort Order (smaller shows first)", type: "number" },
   ],

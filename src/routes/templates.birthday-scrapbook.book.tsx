@@ -162,7 +162,10 @@ function pages(): React.ReactNode[] {
     // 10
     <div key="p10" className="flex h-full flex-col justify-center gap-3">
       <p className="font-note text-right text-[11px] italic text-[var(--ink-soft)]">
-        <EditableText id="book.specialDay" defaultValue="a special day for a truly special person" />
+        <EditableText
+          id="book.specialDay"
+          defaultValue="a special day for a truly special person"
+        />
       </p>
       <PhotoFrame id="b.post2" ratio="4 / 5" pin rotate={-1.6} />
     </div>,

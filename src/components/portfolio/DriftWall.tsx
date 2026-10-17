@@ -1,6 +1,14 @@
-'use client';
+"use client";
 
-import { CSSProperties, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import {
+  CSSProperties,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 export interface DriftWallItem {
   image: string;
@@ -13,7 +21,7 @@ export interface DriftWallItem {
   /** Tile width multiplier inside its column (0.5 - 1) */
   widthScale?: number;
   /** How the photo fills the tile */
-  fit?: 'cover' | 'contain';
+  fit?: "cover" | "contain";
   /** Crop focus point, 0 - 100 (percent) */
   focusX?: number;
   focusY?: number;
@@ -34,14 +42,14 @@ export interface DriftWallProps {
   perspective?: number;
   depth?: number;
   speed?: number;
-  direction?: 'up' | 'down';
+  direction?: "up" | "down";
   variance?: number;
   parallax?: number;
   pauseOnHover?: boolean;
   lift?: number;
   fade?: number;
   /** 'radial' fades every edge (default). 'open-top' starts sharply at the top edge and fades toward the left and bottom. */
-  maskMode?: 'radial' | 'open-top';
+  maskMode?: "radial" | "open-top";
   dim?: number;
   grayscale?: boolean;
   overlayColor?: string;
@@ -55,18 +63,20 @@ interface ColumnMeta {
 }
 
 const DEFAULT_ITEMS: DriftWallItem[] = Array.from({ length: 15 }, (_, i) => {
-  const ids = [1015, 1025, 1039, 1043, 1044, 1050, 1062, 1069, 1074, 1080, 1084, 106, 110, 133, 164];
+  const ids = [
+    1015, 1025, 1039, 1043, 1044, 1050, 1062, 1069, 1074, 1080, 1084, 106, 110, 133, 164,
+  ];
   return {
     image: `https://picsum.photos/id/${ids[i % ids.length]}/600/400`,
     title: `Tile ${i + 1}`,
-    href: undefined
+    href: undefined,
   };
 });
 
-const cx = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(' ');
+const cx = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(" ");
 
 const prefersReducedMotion = (): boolean =>
-  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const columnFactor = (index: number, variance: number): number => {
   const pseudo = ((index * 0.6180339887 + 0.35) % 1) * 2 - 1;
@@ -86,18 +96,18 @@ const DriftWall = ({
   perspective = 1200,
   depth = 120,
   speed = 42,
-  direction = 'up',
+  direction = "up",
   variance = 0.45,
   parallax = 0.6,
   pauseOnHover = false,
   lift = 64,
   fade = 0.6,
-  maskMode = 'radial',
+  maskMode = "radial",
   dim = 0.55,
   grayscale = false,
-  overlayColor = '#060010',
-  className = '',
-  style
+  overlayColor = "#060010",
+  className = "",
+  style,
 }: DriftWallProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const planeRef = useRef<HTMLDivElement>(null);
@@ -119,10 +129,10 @@ const DriftWall = ({
 
   useEffect(() => {
     setReduced(prefersReducedMotion());
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     const onChange = (e: MediaQueryListEvent) => setReduced(e.matches);
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
   }, []);
 
   const columnItems = useMemo<DriftWallItem[][]>(() => {
@@ -132,14 +142,14 @@ const DriftWall = ({
     const scaleOf = (item: DriftWallItem) => Math.max(0.2, item.heightScale ?? 1);
 
     // 1) tiles that were pinned to a specific column
-    items.forEach(item => {
+    items.forEach((item) => {
       if (item.column === undefined || item.column === null) return;
       const c = Math.min(count - 1, Math.max(0, Math.round(item.column)));
       cols[c].push(item);
       heights[c] += scaleOf(item);
     });
     // 2) everything else goes to the currently shortest column
-    items.forEach(item => {
+    items.forEach((item) => {
       if (item.column !== undefined && item.column !== null) return;
       let c = 0;
       for (let i = 1; i < count; i += 1) if (heights[i] < heights[c]) c = i;
@@ -150,8 +160,11 @@ const DriftWall = ({
   }, [items, columns]);
 
   const columnMeta = useMemo<ColumnMeta[]>(() => {
-    return columnItems.map(col => {
-      const total = col.reduce((sum, item) => sum + tileHeight * Math.max(0.2, item.heightScale ?? 1) + gap, 0);
+    return columnItems.map((col) => {
+      const total = col.reduce(
+        (sum, item) => sum + tileHeight * Math.max(0.2, item.heightScale ?? 1) + gap,
+        0,
+      );
       const copyHeight = Math.max(tileHeight + gap, total);
       const copies = Math.max(2, Math.ceil((containerHeight * 1.6) / copyHeight) + 1);
       return { copyHeight, copies };
@@ -168,7 +181,7 @@ const DriftWall = ({
   }, []);
 
   const baseVelocities = useMemo<number[]>(() => {
-    const dirSign = direction === 'up' ? 1 : -1;
+    const dirSign = direction === "up" ? 1 : -1;
     return columnItems.map((_, c) => {
       const altSign = c % 2 === 0 ? 1 : -1;
       return speed * columnFactor(c, variance) * dirSign * altSign;
@@ -189,7 +202,7 @@ const DriftWall = ({
         `rotateX(${tilt + py}deg) rotateY(${turn + px}deg) rotateZ(${roll}deg) ` +
         `translateZ(${-depth}px)`;
     },
-    [tilt, turn, roll, depth]
+    [tilt, turn, roll, depth],
   );
 
   useEffect(() => {
@@ -227,7 +240,8 @@ const DriftWall = ({
         for (let c = 0; c < trackRefs.current.length; c++) {
           const el = trackRefs.current[c];
           const meta = columnMeta[c];
-          if (el && meta) el.style.transform = `translate3d(0, ${-(offsetsRef.current[c] ?? 0)}px, 0)`;
+          if (el && meta)
+            el.style.transform = `translate3d(0, ${-(offsetsRef.current[c] ?? 0)}px, 0)`;
         }
       }
 
@@ -260,11 +274,12 @@ const DriftWall = ({
       if (parallax > 0 && !reduced) {
         pointerRef.current = {
           x: (e.clientX - rect.left) / rect.width - 0.5,
-          y: (e.clientY - rect.top) / rect.height - 0.5
+          y: (e.clientY - rect.top) / rect.height - 0.5,
         };
       }
       const hit = document.elementFromPoint(e.clientX, e.clientY);
-      const tile = hit && hit.closest ? (hit.closest('[data-tile-id]') as HTMLElement | null) : null;
+      const tile =
+        hit && hit.closest ? (hit.closest("[data-tile-id]") as HTMLElement | null) : null;
       if (!tile) return;
       const id = tile.dataset.tileId ?? null;
       if (id === activeIdRef.current) return;
@@ -272,7 +287,7 @@ const DriftWall = ({
       hoveredColRef.current = Number(tile.dataset.col);
       setActiveId(id);
     },
-    [parallax, reduced]
+    [parallax, reduced],
   );
 
   const handlePointerLeaveWall = useCallback((): void => {
@@ -282,60 +297,73 @@ const DriftWall = ({
   }, [release]);
 
   const maskStyle =
-    maskMode === 'open-top'
-      ? 'linear-gradient(to right, transparent 0%, #000 var(--dw-side), #000 100%), ' +
-        'linear-gradient(to bottom, #000 0%, #000 var(--dw-edge-v), transparent 100%)'
-      : 'radial-gradient(ellipse 78% 82% at 50% 46%, #000 var(--dw-edge), transparent 100%), ' +
-        'linear-gradient(to top, #000 var(--dw-edge), transparent 100%)';
+    maskMode === "open-top"
+      ? "linear-gradient(to right, transparent 0%, #000 var(--dw-side), #000 100%), " +
+        "linear-gradient(to bottom, #000 0%, #000 var(--dw-edge-v), transparent 100%)"
+      : "radial-gradient(ellipse 78% 82% at 50% 46%, #000 var(--dw-edge), transparent 100%), " +
+        "linear-gradient(to top, #000 var(--dw-edge), transparent 100%)";
 
   const cssVars = useMemo<CSSProperties>(
     () =>
       ({
-        '--dw-tile-w': `${tileWidth}px`,
-        '--dw-tile-h': `${tileHeight}px`,
-        '--dw-gap': `${gap}px`,
-        '--dw-radius': `${radius}px`,
-        '--dw-lift': `${lift}px`,
-        '--dw-dim': dim,
-        '--dw-gray': grayscale ? 1 : 0,
-        '--dw-overlay': overlayColor,
-        '--dw-edge': `${Math.max(0, (1 - fade) * 100)}%`,
-        '--dw-side': `${Math.round(Math.max(0, fade) * 22)}%`,
-        '--dw-edge-v': `${Math.round((1 - fade) * 100 + 5)}%`,
+        "--dw-tile-w": `${tileWidth}px`,
+        "--dw-tile-h": `${tileHeight}px`,
+        "--dw-gap": `${gap}px`,
+        "--dw-radius": `${radius}px`,
+        "--dw-lift": `${lift}px`,
+        "--dw-dim": dim,
+        "--dw-gray": grayscale ? 1 : 0,
+        "--dw-overlay": overlayColor,
+        "--dw-edge": `${Math.max(0, (1 - fade) * 100)}%`,
+        "--dw-side": `${Math.round(Math.max(0, fade) * 22)}%`,
+        "--dw-edge-v": `${Math.round((1 - fade) * 100 + 5)}%`,
         perspective: `${perspective}px`,
-        perspectiveOrigin: '50% 50%',
+        perspectiveOrigin: "50% 50%",
         WebkitMaskImage: maskStyle,
         maskImage: maskStyle,
-        WebkitMaskComposite: 'source-in',
-        maskComposite: 'intersect',
-        ...style
+        WebkitMaskComposite: "source-in",
+        maskComposite: "intersect",
+        ...style,
       }) as CSSProperties,
-    [tileWidth, tileHeight, gap, radius, lift, dim, grayscale, overlayColor, fade, perspective, maskStyle, style]
+    [
+      tileWidth,
+      tileHeight,
+      gap,
+      radius,
+      lift,
+      dim,
+      grayscale,
+      overlayColor,
+      fade,
+      perspective,
+      maskStyle,
+      style,
+    ],
   );
 
   const tileClass = cx(
-    'group/tile relative block flex-none cursor-pointer outline-none',
-    'w-full h-[calc(var(--dw-tile-h)+var(--dw-gap))] [transform-style:preserve-3d]'
+    "group/tile relative block flex-none cursor-pointer outline-none",
+    "w-full h-[calc(var(--dw-tile-h)+var(--dw-gap))] [transform-style:preserve-3d]",
   );
   const innerClass = cx(
-    'pointer-events-none absolute inset-[calc(var(--dw-gap)/2)] block overflow-hidden bg-[#0b0b12]',
-    'rounded-[var(--dw-radius)] opacity-[var(--dw-dim)] [transform:translateZ(0)]',
-    'transition-[transform,opacity,box-shadow] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)]',
-    'group-[.is-active]/tile:opacity-100 group-[.is-active]/tile:[transform:translateZ(var(--dw-lift))]',
-    'group-[.is-active]/tile:shadow-[0_24px_60px_-18px_rgba(0,0,0,0.7)]',
-    'group-focus-visible/tile:opacity-100 group-focus-visible/tile:[transform:translateZ(var(--dw-lift))]',
-    'group-focus-visible/tile:shadow-[0_24px_60px_-18px_rgba(0,0,0,0.7),0_0_0_2px_rgba(255,255,255,0.9)]'
+    "pointer-events-none absolute inset-[calc(var(--dw-gap)/2)] block overflow-hidden bg-[#0b0b12]",
+    "rounded-[var(--dw-radius)] opacity-[var(--dw-dim)] [transform:translateZ(0)]",
+    "transition-[transform,opacity,box-shadow] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
+    "group-[.is-active]/tile:opacity-100 group-[.is-active]/tile:[transform:translateZ(var(--dw-lift))]",
+    "group-[.is-active]/tile:shadow-[0_24px_60px_-18px_rgba(0,0,0,0.7)]",
+    "group-focus-visible/tile:opacity-100 group-focus-visible/tile:[transform:translateZ(var(--dw-lift))]",
+    "group-focus-visible/tile:shadow-[0_24px_60px_-18px_rgba(0,0,0,0.7),0_0_0_2px_rgba(255,255,255,0.9)]",
   );
   const imgClass = cx(
-    'block h-full w-full select-none object-cover',
-    '[filter:grayscale(var(--dw-gray))_saturate(0.92)]',
-    'transition-[filter] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)]',
-    'group-[.is-active]/tile:[filter:grayscale(0)_saturate(1.05)] group-focus-visible/tile:[filter:grayscale(0)_saturate(1.05)]'
+    "block h-full w-full select-none object-cover",
+    "[filter:grayscale(var(--dw-gray))_saturate(0.92)]",
+    "transition-[filter] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
+    "group-[.is-active]/tile:[filter:grayscale(0)_saturate(1.05)] group-focus-visible/tile:[filter:grayscale(0)_saturate(1.05)]",
   );
   const overlayClass = cx(
-    'pointer-events-none absolute inset-0 bg-[var(--dw-overlay)] opacity-[0.42]',
-    'transition-opacity duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)]',
-    'group-[.is-active]/tile:opacity-0 group-focus-visible/tile:opacity-0'
+    "pointer-events-none absolute inset-0 bg-[var(--dw-overlay)] opacity-[0.42]",
+    "transition-opacity duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
+    "group-[.is-active]/tile:opacity-0 group-focus-visible/tile:opacity-0",
   );
 
   const renderTile = (item: DriftWallItem, id: string, colIndex: number) => {
@@ -348,20 +376,20 @@ const DriftWall = ({
 
     const innerStyle: CSSProperties = { left: sideInset, right: sideInset };
     const imgStyle: CSSProperties = {
-      objectFit: item.fit ?? 'cover',
+      objectFit: item.fit ?? "cover",
       objectPosition: `${focusX}% ${focusY}%`,
       transformOrigin: `${focusX}% ${focusY}%`,
-      transform: zoom > 1 ? `scale(${zoom})` : undefined
+      transform: zoom > 1 ? `scale(${zoom})` : undefined,
     };
     const tileStyle: CSSProperties = {
-      height: `calc(var(--dw-tile-h) * ${heightScale} + var(--dw-gap))`
+      height: `calc(var(--dw-tile-h) * ${heightScale} + var(--dw-gap))`,
     };
 
     const inner = (
       <span className={innerClass} style={innerStyle}>
         <img
           src={item.image}
-          alt={item.title ?? ''}
+          alt={item.title ?? ""}
           loading="lazy"
           decoding="async"
           draggable={false}
@@ -372,12 +400,12 @@ const DriftWall = ({
       </span>
     );
     const commonProps = {
-      className: cx(tileClass, activeId === id && 'is-active'),
+      className: cx(tileClass, activeId === id && "is-active"),
       style: tileStyle,
-      'data-tile-id': id,
-      'data-col': colIndex,
+      "data-tile-id": id,
+      "data-col": colIndex,
       onFocus: () => activate(id, colIndex),
-      onBlur: release
+      onBlur: release,
     };
     if (item.href) {
       return (
@@ -397,7 +425,7 @@ const DriftWall = ({
   return (
     <div
       ref={containerRef}
-      className={cx('relative h-full w-full overflow-hidden', className)}
+      className={cx("relative h-full w-full overflow-hidden", className)}
       style={cssVars}
       onPointerMove={handlePointerMove}
       onPointerEnter={() => {
@@ -421,12 +449,14 @@ const DriftWall = ({
             >
               <div
                 className="flex flex-col [transform-style:preserve-3d] will-change-transform"
-                ref={el => {
+                ref={(el) => {
                   trackRefs.current[c] = el;
                 }}
               >
                 {copies.map((_, copyIndex) =>
-                  col.map((item, itemIndex) => renderTile(item, `${c}-${copyIndex}-${itemIndex}`, c))
+                  col.map((item, itemIndex) =>
+                    renderTile(item, `${c}-${copyIndex}-${itemIndex}`, c),
+                  ),
                 )}
               </div>
             </div>

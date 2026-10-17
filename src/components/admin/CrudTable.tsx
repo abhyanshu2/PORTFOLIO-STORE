@@ -57,7 +57,7 @@ export function CrudTable({ config }: { config: TableConfig }) {
     setEditingRow(null);
     const initial: Record<string, string> = {};
     config.fields.forEach((f) => {
-      initial[f.key] = f.type === "select" ? f.options?.[0] ?? "" : "";
+      initial[f.key] = f.type === "select" ? (f.options?.[0] ?? "") : "";
     });
     setFormValues(initial);
     setFormOpen(true);
@@ -95,7 +95,12 @@ export function CrudTable({ config }: { config: TableConfig }) {
       }
       setFormValues((v) => {
         if (multi) {
-          const existing = v[key] ? v[key].split(",").map((s) => s.trim()).filter(Boolean) : [];
+          const existing = v[key]
+            ? v[key]
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean)
+            : [];
           return { ...v, [key]: [...existing, ...urls].join(", ") };
         }
         return { ...v, [key]: urls[0] };
@@ -120,7 +125,10 @@ export function CrudTable({ config }: { config: TableConfig }) {
       else payload[f.key] = raw === "" ? null : raw;
     }
     const res = editingRow
-      ? await supabase.from(config.table).update(payload).eq(config.primaryKey, editingRow[config.primaryKey])
+      ? await supabase
+          .from(config.table)
+          .update(payload)
+          .eq(config.primaryKey, editingRow[config.primaryKey])
       : await supabase.from(config.table).insert(payload);
     setSaving(false);
     if (res.error) {
@@ -132,9 +140,13 @@ export function CrudTable({ config }: { config: TableConfig }) {
   }
 
   async function handleDelete(row: Row) {
-    if (!confirm(`Delete "${row[titleKey] ?? row[config.primaryKey]}"? This can't be undone.`)) return;
+    if (!confirm(`Delete "${row[titleKey] ?? row[config.primaryKey]}"? This can't be undone.`))
+      return;
     setDeletingId(row[config.primaryKey]);
-    const { error: err } = await supabase.from(config.table).delete().eq(config.primaryKey, row[config.primaryKey]);
+    const { error: err } = await supabase
+      .from(config.table)
+      .delete()
+      .eq(config.primaryKey, row[config.primaryKey]);
     setDeletingId(null);
     if (err) {
       setError(err.message);
@@ -179,7 +191,9 @@ export function CrudTable({ config }: { config: TableConfig }) {
                 {rows.map((row) => (
                   <tr key={row[config.primaryKey]}>
                     {config.listColumns.map((col) => (
-                      <td key={col}>{Array.isArray(row[col]) ? row[col].join(", ") : String(row[col] ?? "—")}</td>
+                      <td key={col}>
+                        {Array.isArray(row[col]) ? row[col].join(", ") : String(row[col] ?? "—")}
+                      </td>
                     ))}
                     <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                       <button onClick={() => openEdit(row)} className="admin-btn-small">
@@ -211,15 +225,30 @@ export function CrudTable({ config }: { config: TableConfig }) {
                 {config.listColumns
                   .filter((c) => c !== titleKey)
                   .map((col) => (
-                    <div key={col} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, padding: "5px 0", borderTop: "1px solid var(--border)" }}>
-                      <span style={{ color: "var(--muted)", textTransform: "capitalize" }}>{col.replace(/_/g, " ")}</span>
+                    <div
+                      key={col}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        fontSize: 12,
+                        padding: "5px 0",
+                        borderTop: "1px solid var(--border)",
+                      }}
+                    >
+                      <span style={{ color: "var(--muted)", textTransform: "capitalize" }}>
+                        {col.replace(/_/g, " ")}
+                      </span>
                       <span style={{ color: "var(--text)", textAlign: "right" }}>
                         {Array.isArray(row[col]) ? row[col].join(", ") : String(row[col] ?? "—")}
                       </span>
                     </div>
                   ))}
                 <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
-                  <button onClick={() => openEdit(row)} className="admin-btn-small" style={{ flex: 1 }}>
+                  <button
+                    onClick={() => openEdit(row)}
+                    className="admin-btn-small"
+                    style={{ flex: 1 }}
+                  >
                     Edit
                   </button>
                   {!config.noAddDelete && (
@@ -242,7 +271,9 @@ export function CrudTable({ config }: { config: TableConfig }) {
       {formOpen && (
         <div className="admin-overlay" onClick={closeForm}>
           <form onClick={(e) => e.stopPropagation()} onSubmit={handleSave} className="admin-modal">
-            <h3 className="admin-modal-title">{editingRow ? `Edit ${config.singular}` : `Add ${config.singular}`}</h3>
+            <h3 className="admin-modal-title">
+              {editingRow ? `Edit ${config.singular}` : `Add ${config.singular}`}
+            </h3>
             {error && <div className="admin-error">{error}</div>}
             {config.fields.map((f) => (
               <div key={f.key} className="admin-field">
@@ -276,14 +307,23 @@ export function CrudTable({ config }: { config: TableConfig }) {
                   <div>
                     <input
                       type="url"
-                      placeholder={f.type === "image" ? "Paste an image URL, or upload below" : "Paste a video URL, or upload below"}
+                      placeholder={
+                        f.type === "image"
+                          ? "Paste an image URL, or upload below"
+                          : "Paste a video URL, or upload below"
+                      }
                       value={formValues[f.key] ?? ""}
                       onChange={(e) => setFormValues((v) => ({ ...v, [f.key]: e.target.value }))}
                       className="admin-input"
                       style={{ marginBottom: 8 }}
                     />
-                    <label className="admin-btn-small" style={{ display: "inline-block", cursor: "pointer" }}>
-                      {uploading[f.key] ? "Uploading…" : `Upload ${f.type === "image" ? "Image" : "Video"}`}
+                    <label
+                      className="admin-btn-small"
+                      style={{ display: "inline-block", cursor: "pointer" }}
+                    >
+                      {uploading[f.key]
+                        ? "Uploading…"
+                        : `Upload ${f.type === "image" ? "Image" : "Video"}`}
                       <input
                         type="file"
                         accept={f.type === "image" ? "image/*" : "video/*"}
@@ -296,11 +336,27 @@ export function CrudTable({ config }: { config: TableConfig }) {
                       <img
                         src={formValues[f.key]}
                         alt=""
-                        style={{ display: "block", marginTop: 10, maxHeight: 90, borderRadius: 8, border: "1px solid var(--border-strong)" }}
+                        style={{
+                          display: "block",
+                          marginTop: 10,
+                          maxHeight: 90,
+                          borderRadius: 8,
+                          border: "1px solid var(--border-strong)",
+                        }}
                       />
                     )}
                     {f.type === "video" && formValues[f.key] && (
-                      <video src={formValues[f.key]} controls style={{ display: "block", marginTop: 10, maxHeight: 120, borderRadius: 8, width: "100%" }} />
+                      <video
+                        src={formValues[f.key]}
+                        controls
+                        style={{
+                          display: "block",
+                          marginTop: 10,
+                          maxHeight: 120,
+                          borderRadius: 8,
+                          width: "100%",
+                        }}
+                      />
                     )}
                   </div>
                 ) : f.type === "image-array" ? (
@@ -313,7 +369,10 @@ export function CrudTable({ config }: { config: TableConfig }) {
                       className="admin-textarea"
                       style={{ marginBottom: 8 }}
                     />
-                    <label className="admin-btn-small" style={{ display: "inline-block", cursor: "pointer" }}>
+                    <label
+                      className="admin-btn-small"
+                      style={{ display: "inline-block", cursor: "pointer" }}
+                    >
                       {uploading[f.key] ? "Uploading…" : "+ Upload Images"}
                       <input
                         type="file"
@@ -335,7 +394,13 @@ export function CrudTable({ config }: { config: TableConfig }) {
                               key={i}
                               src={u}
                               alt=""
-                              style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 6, border: "1px solid var(--border-strong)" }}
+                              style={{
+                                width: 56,
+                                height: 56,
+                                objectFit: "cover",
+                                borderRadius: 6,
+                                border: "1px solid var(--border-strong)",
+                              }}
                             />
                           ))}
                       </div>

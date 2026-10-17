@@ -120,5 +120,18 @@ function AdminDashboardPage() {
 }
 
 function FullscreenMsg({ text }: { text: string }) {
-  return <div className="admin-shell" style={{ display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "var(--muted)" }}>{text}</div>;
+  return (
+    <div
+      className="admin-shell"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 13,
+        color: "var(--muted)",
+      }}
+    >
+      {text}
+    </div>
+  );
 }

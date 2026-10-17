@@ -11,7 +11,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   // eslint-disable-next-line no-console
   console.error(
     "Missing VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY — check that your .env file " +
-      "is in the project root (next to package.json) and restart `npm run dev`."
+      "is in the project root (next to package.json) and restart `npm run dev`.",
   );
 }
 
@@ -23,6 +23,5 @@ export const supabase = createClient(
       persistSession: true,
       autoRefreshToken: true,
     },
-  }
+  },
 );
-

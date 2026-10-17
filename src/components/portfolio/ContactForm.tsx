@@ -30,7 +30,15 @@ export function ContactForm() {
 
   if (status === "sent") {
     return (
-      <div style={{ ...cardStyle, display: "flex", flexDirection: "column", gap: 14, alignItems: "flex-start" }}>
+      <div
+        style={{
+          ...cardStyle,
+          display: "flex",
+          flexDirection: "column",
+          gap: 14,
+          alignItems: "flex-start",
+        }}
+      >
         <p style={{ fontSize: 14, color: "var(--heading)", lineHeight: 1.7 }}>
           Thanks{name ? `, ${name}` : ""}, your message is in. I'll get back to you soon.
         </p>
@@ -68,14 +76,29 @@ export function ContactForm() {
       <label style={fieldWrap}>
         <span style={labelStyle}>Subject</span>
         <span style={{ position: "relative", display: "block" }}>
-          <select value={subject} onChange={(e) => setSubject(e.target.value)} style={{ ...inputStyle, appearance: "none", paddingRight: 36, cursor: "pointer" }}>
+          <select
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            style={{ ...inputStyle, appearance: "none", paddingRight: 36, cursor: "pointer" }}
+          >
             {SUBJECTS.map((s) => (
               <option key={s} value={s}>
                 {s}
               </option>
             ))}
           </select>
-          <span aria-hidden="true" style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "var(--muted)", fontSize: 12 }}>
+          <span
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              right: 14,
+              top: "50%",
+              transform: "translateY(-50%)",
+              pointerEvents: "none",
+              color: "var(--muted)",
+              fontSize: 12,
+            }}
+          >
             ▾
           </span>
         </span>
@@ -96,7 +119,12 @@ export function ContactForm() {
           Something went wrong sending that. Please try again, or email me directly.
         </p>
       )}
-      <button type="submit" disabled={status === "sending"} className="btn-primary" style={{ opacity: status === "sending" ? 0.6 : 1 }}>
+      <button
+        type="submit"
+        disabled={status === "sending"}
+        className="btn-primary"
+        style={{ opacity: status === "sending" ? 0.6 : 1 }}
+      >
         {status === "sending" ? "Sending…" : "Send Message ↗"}
       </button>
     </form>

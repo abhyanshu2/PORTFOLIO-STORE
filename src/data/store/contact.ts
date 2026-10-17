@@ -4,7 +4,11 @@ export const STORE_CONTACT = [
   { label: "WhatsApp", value: "+91 6206358342", href: `https://wa.me/${WHATSAPP_NUMBER}` },
   { label: "Email", value: "abhyanshu2@gmail.com", href: "mailto:abhyanshu2@gmail.com" },
   { label: "GitHub", value: "github.com/abhyanshu2", href: "https://github.com/abhyanshu2" },
-  { label: "LinkedIn", value: "linkedin.com/in/abhyanshu", href: "https://linkedin.com/in/abhyanshu" },
+  {
+    label: "LinkedIn",
+    value: "linkedin.com/in/abhyanshu",
+    href: "https://linkedin.com/in/abhyanshu",
+  },
 ];
 
 export function buildWhatsAppUrl(productName: string): string {
