@@ -296,6 +296,16 @@ nav.scrolled{
   animation:slideUp .9s cubic-bezier(.22,1,.36,1) .28s both;
 }
 .hero-title .dim{color:var(--muted);font-style:italic}
+/* Animated name (TechText). Everything scales with --tt-w, so only this number decides the size.
+   Tune the vertical space with the two margins and the height ratio if the name sits too high or low. */
+.hero-tech{
+  --tt-w:min(92vw,1144px);
+  display:block; position:relative;
+  width:var(--tt-w); height:calc(var(--tt-w)*.17);
+  margin-left:calc(var(--tt-w)*-.05);
+  margin-top:calc(var(--tt-w)*-.03);
+  margin-bottom:calc(var(--tt-w)*-.042);
+}
 .hero-subtitle-row{
   display:flex; flex-direction:column; align-items:flex-start;
   margin-top:36px; gap:24px;
