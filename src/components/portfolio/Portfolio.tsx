@@ -22,7 +22,7 @@ export function Portfolio({ onOpenStore }: Props) {
   const drift = useDriftWall();
   const heroRef = useRef<HTMLElement | null>(null);
 
-  // The hero wall starts right after the last letter of the name and right under the menu bar
+  
   useEffect(() => {
     const hero = heroRef.current;
     const title = hero?.querySelector(".hero-title");
@@ -32,7 +32,6 @@ export function Portfolio({ onOpenStore }: Props) {
     const update = () => {
       const heroBox = hero.getBoundingClientRect();
       const titleBox = title.getBoundingClientRect();
-      // the letters fill 5% to 95% of the animated name box
       const techBox = tech?.getBoundingClientRect();
       const nameRight = techBox ? techBox.left + techBox.width * 0.95 : titleBox.right;
       hero.style.setProperty("--drift-left", `${Math.round(nameRight - heroBox.left)}px`);
