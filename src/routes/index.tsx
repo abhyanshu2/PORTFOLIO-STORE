@@ -10,16 +10,16 @@ const StoreOverlay = lazy(() =>
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Abhyanshu Raj — Frontend Developer" },
+      { title: "Abhyanshu Raj | Frontend Developer" },
       {
         name: "description",
         content:
-          "Portfolio and premium digital store by Abhyanshu Raj — React, Next.js templates, apps, free resources, and services.",
+          "Portfolio and premium digital store by Abhyanshu Raj: React, Next.js templates, apps, free resources, and services.",
       },
-      { property: "og:title", content: "Abhyanshu Raj — Frontend Developer" },
+      { property: "og:title", content: "Abhyanshu Raj | Frontend Developer" },
       {
         property: "og:description",
-        content: "Portfolio and premium digital store — templates, apps, resources, and services.",
+        content: "Portfolio and premium digital store: templates, apps, resources, and services.",
       },
     ],
   }),

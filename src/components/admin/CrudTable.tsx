@@ -106,7 +106,7 @@ export function CrudTable({ config }: { config: TableConfig }) {
         return { ...v, [key]: urls[0] };
       });
     } catch (err: any) {
-      setError(err.message || "Upload failed — please try again.");
+      setError(err.message || "Upload failed, please try again.");
     } finally {
       setUploading((u) => ({ ...u, [key]: false }));
     }
@@ -174,7 +174,7 @@ export function CrudTable({ config }: { config: TableConfig }) {
       {loading ? (
         <div className="admin-empty">Loading…</div>
       ) : rows.length === 0 ? (
-        <div className="admin-empty">No rows yet — add your first one.</div>
+        <div className="admin-empty">No rows yet. Add your first one.</div>
       ) : (
         <>
           <div className="admin-table-wrap admin-table-desktop">
@@ -192,7 +192,7 @@ export function CrudTable({ config }: { config: TableConfig }) {
                   <tr key={row[config.primaryKey]}>
                     {config.listColumns.map((col) => (
                       <td key={col}>
-                        {Array.isArray(row[col]) ? row[col].join(", ") : String(row[col] ?? "—")}
+                        {Array.isArray(row[col]) ? row[col].join(", ") : String(row[col] ?? "-")}
                       </td>
                     ))}
                     <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
@@ -239,7 +239,7 @@ export function CrudTable({ config }: { config: TableConfig }) {
                         {col.replace(/_/g, " ")}
                       </span>
                       <span style={{ color: "var(--text)", textAlign: "right" }}>
-                        {Array.isArray(row[col]) ? row[col].join(", ") : String(row[col] ?? "—")}
+                        {Array.isArray(row[col]) ? row[col].join(", ") : String(row[col] ?? "-")}
                       </span>
                     </div>
                   ))}
@@ -299,7 +299,7 @@ export function CrudTable({ config }: { config: TableConfig }) {
                   >
                     {f.options?.map((opt) => (
                       <option key={opt} value={opt}>
-                        {opt || "— none —"}
+                        {opt || "none"}
                       </option>
                     ))}
                   </select>

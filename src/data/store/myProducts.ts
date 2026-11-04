@@ -15,7 +15,7 @@ export const MY_PRODUCTS: MyProduct[] = [
     id: "notiq",
     name: "NOTIQ",
     monogram: "NQ",
-    description: "Sticky notes reimagined — persistent, keyboard-friendly, and fast.",
+    description: "Sticky notes reimagined: persistent, keyboard-friendly, and fast.",
     features: ["Local persistence", "Keyboard shortcuts", "Dark mode", "Export"],
     stack: ["React", "TypeScript", "Tailwind"],
     status: "live",

@@ -584,7 +584,7 @@ export function DriftPanel() {
               {/* crop area */}
               <div>
                 <div style={{ ...smallLabel, marginBottom: 8 }}>
-                  Crop — drag or click to choose the visible part
+                  Crop: drag or click to choose the visible part
                 </div>
                 <div
                   ref={cropRef}

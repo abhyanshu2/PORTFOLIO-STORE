@@ -7,13 +7,13 @@ import { useDesktopPinning } from "@/lib/scrapbook-store";
 export const Route = createFileRoute("/templates/birthday-scrapbook/")({
   head: () => ({
     meta: [
-      { title: "Birthday Scrapbook Template — Live Demo" },
+      { title: "Birthday Scrapbook Template | Live Demo" },
       {
         name: "description",
         content:
-          "A red film-photo birthday collage you can fill with your own pictures and words — add photos, edit every caption, arrange it your way.",
+          "A red film-photo birthday collage you can fill with your own pictures and words. Add photos, edit every caption, arrange it your way.",
       },
-      { property: "og:title", content: "Birthday Scrapbook Template — Live Demo" },
+      { property: "og:title", content: "Birthday Scrapbook Template | Live Demo" },
       {
         property: "og:description",
         content: "Add your photos, edit the notes, and make this birthday collage yours.",

@@ -60,7 +60,7 @@ export function ContactSection() {
       }}
     >
       <div className="fade-up" style={{ marginBottom: 40 }}>
-        <div className="section-label">06 — contact</div>
+        <div className="section-label">06 contact</div>
         <h2
           style={{
             fontFamily: "'Playfair Display', serif",

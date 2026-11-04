@@ -90,14 +90,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Abhyanshu Raj — Frontend Developer & Digital Store" },
+      { title: "Abhyanshu Raj | Frontend Developer & Digital Store" },
       {
         name: "description",
         content:
           "Frontend developer building pixel-perfect interfaces with React & Next.js. Browse premium templates, apps, and free resources in the built-in digital store.",
       },
       { name: "author", content: "Abhyanshu Raj" },
-      { property: "og:title", content: "Abhyanshu Raj — Frontend Developer" },
+      { property: "og:title", content: "Abhyanshu Raj | Frontend Developer" },
       {
         property: "og:description",
         content: "Portfolio + premium digital marketplace by Abhyanshu Raj.",

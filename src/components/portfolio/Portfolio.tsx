@@ -178,7 +178,7 @@ export function Portfolio({ onOpenStore }: Props) {
 
       {/* NAV */}
       <nav id="nav" className={scrolled ? "scrolled" : ""}>
-        <a href="#" className="nav-logo">Abhyanshu<span>.</span></a>
+        <a href="#" className="nav-logo">Abhyanshu</a>
         <ul className="nav-links">
           <li><a href="#about">About</a></li>
           <li><a href="#skills">Skills</a></li>
@@ -237,7 +237,7 @@ export function Portfolio({ onOpenStore }: Props) {
           <Link to="/admin/login" aria-label="Admin" className="badge-dot" style={{ cursor: "pointer" }}></Link>
           OPEN TO OPPORTUNITIES
         </div>
-        <div className="hero-number">01 — INTRODUCTION</div>
+        <div className="hero-number">01 INTRODUCTION</div>
         <h1 className="hero-title">
           <span className="hero-tech">
             <TechText
@@ -298,7 +298,7 @@ export function Portfolio({ onOpenStore }: Props) {
       {/* ABOUT */}
       <section className="about" id="about">
         <div className="about-left fade-up">
-          <div className="section-label">01 — about</div>
+          <div className="section-label">01 about</div>
           <div className="big-text">WHO<br />I <em>AM.</em></div>
           <div className="stats-row">
             <div className="stat"><span className="stat-num">2+</span><span className="stat-label">Years Learning</span></div>
@@ -308,9 +308,9 @@ export function Portfolio({ onOpenStore }: Props) {
           </div>
         </div>
         <div className="about-right fade-up">
-          <p className="about-para">I'm a <strong>Diploma student in Computer Science & Engineering</strong> currently in my 4th semester. What started with HTML and CSS turned into a full-stack rabbit hole — React, Next.js, Node.js, MongoDB, and shipping real interfaces that feel intentional.</p>
+          <p className="about-para">I'm a <strong>Diploma student in Computer Science & Engineering</strong> currently in my 4th semester. What started with HTML and CSS turned into a full-stack rabbit hole: React, Next.js, Node.js, MongoDB, and shipping real interfaces that feel intentional.</p>
           <p className="about-para">Passionate about <strong>clean UI, modern design systems</strong>, and building things that actually work. Exploring Framer Motion, TypeScript, and scalable backend architectures.</p>
-          <p className="about-para">When I'm not coding, I'm <strong>watching tech YouTube</strong>, exploring new gadgets, or travelling. Based in <strong>Vaishali, Bihar</strong> — available for remote &amp; freelance opportunities.</p>
+          <p className="about-para">When I'm not coding, I'm <strong>watching tech YouTube</strong>, exploring new gadgets, or travelling. Based in <strong>Vaishali, Bihar</strong>, available for remote &amp; freelance opportunities.</p>
         </div>
       </section>
 
@@ -318,7 +318,7 @@ export function Portfolio({ onOpenStore }: Props) {
       <section className="skills" id="skills">
         <div className="skills-header fade-up">
           <div>
-            <div className="section-label">02 — skills</div>
+            <div className="section-label">02 skills</div>
             <h2 className="skills-title">MY<br />TOOLKIT</h2>
           </div>
           <p className="skills-desc">Things I build with daily, growing in, and rely on to design, ship, and iterate.</p>
@@ -341,7 +341,7 @@ export function Portfolio({ onOpenStore }: Props) {
       {/* PROJECTS */}
       <section className="projects" id="projects">
         <div className="projects-header fade-up">
-          <div className="section-label">03 — projects</div>
+          <div className="section-label">03 projects</div>
           <h2 className="projects-title">SELECTED<br /><em style={{ fontStyle: "italic", color: "var(--muted)" }}>Work</em></h2>
         </div>
         <div className="project-featured fade-up">
@@ -402,25 +402,25 @@ export function Portfolio({ onOpenStore }: Props) {
       {/* EDUCATION */}
       <section className="education" id="education">
         <div className="fade-up">
-          <div className="section-label">05 — education</div>
+          <div className="section-label">05 education</div>
           <h2 className="education-title">LEARNING<br /><em style={{ fontStyle: "italic", color: "var(--muted)" }}>Path</em></h2>
         </div>
         <div className="edu-list fade-up">
           <div className="edu-item">
-            <span className="edu-year">2023 — NOW</span>
-            <span className="edu-degree">Diploma — Computer Science &amp; Engg<br /><small style={{ color: "var(--muted2)", fontSize: 12, fontWeight: 400 }}>Currently in 4th Semester</small></span>
+            <span className="edu-year">2023 - NOW</span>
+            <span className="edu-degree">Diploma in Computer Science &amp; Engg<br /><small style={{ color: "var(--muted2)", fontSize: 12, fontWeight: 400 }}>Currently in 4th Semester</small></span>
             <span className="edu-school">Pursuing Diploma</span>
             <span className="edu-score">In Progress</span>
           </div>
           <div className="edu-item">
             <span className="edu-year">2023</span>
-            <span className="edu-degree">12th — Science (BSEB)</span>
+            <span className="edu-degree">12th Science (BSEB)</span>
             <span className="edu-school">Akshyawat College Mahua, Vaishali</span>
             <span className="edu-score">60%</span>
           </div>
           <div className="edu-item">
             <span className="edu-year">2021</span>
-            <span className="edu-degree">10th — CBSE</span>
+            <span className="edu-degree">10th CBSE</span>
             <span className="edu-school">Delhi Public School International, Muzaffarpur</span>
             <span className="edu-score">80%</span>
           </div>

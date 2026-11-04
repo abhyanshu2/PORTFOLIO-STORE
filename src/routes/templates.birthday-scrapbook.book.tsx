@@ -10,13 +10,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/templates/birthday-scrapbook/book")({
   head: () => ({
     meta: [
-      { title: "Birthday Scrapbook — Flip Through Every Page" },
+      { title: "Birthday Scrapbook | Flip Through Every Page" },
       {
         name: "description",
         content:
           "A flip-through birthday scrapbook: turn the pages with your mouse, add your own photos and edit every note.",
       },
-      { property: "og:title", content: "Birthday Scrapbook — Flip Through Every Page" },
+      { property: "og:title", content: "Birthday Scrapbook | Flip Through Every Page" },
       {
         property: "og:description",
         content: "Turn the pages, add photos and write your own notes in this birthday scrapbook.",
@@ -51,7 +51,7 @@ function Sticky({ id, text, tone }: { id: string; text: string; tone: string }) 
 
 function pages(): React.ReactNode[] {
   return [
-    // 1 — cover
+    // 1: cover
     <div key="p1" className="flex h-full flex-col items-center justify-center gap-4 text-center">
       <Kicker>a little book for you</Kicker>
       <h2 className="font-script text-4xl leading-none text-[var(--pin-red)] sm:text-5xl">
@@ -67,7 +67,7 @@ function pages(): React.ReactNode[] {
       </p>
     </div>,
 
-    // 2 — cover right: hero photo
+    // 2: cover right: hero photo
     <div key="p2" className="flex h-full flex-col justify-center gap-3">
       <PhotoFrame id="b.cover" ratio="4 / 5" pin caption={null} />
       <p className="text-center font-note text-[11px] italic text-[var(--ink-soft)]">
@@ -75,7 +75,7 @@ function pages(): React.ReactNode[] {
       </p>
     </div>,
 
-    // 3 — new chapter wish
+    // 3: new chapter wish
     <div key="p3" className="flex h-full flex-col justify-center gap-3">
       <Kicker>a new chapter</Kicker>
       <p className="font-note text-[12px] leading-relaxed text-[var(--ink)]">
@@ -94,7 +94,7 @@ function pages(): React.ReactNode[] {
       <PhotoFrame id="b.wish" ratio="3 / 4" pin rotate={-2} className="w-4/5" />
     </div>,
 
-    // 5 — date
+    // 5: date
     <div key="p5" className="flex h-full flex-col items-center justify-center gap-1 text-center">
       <p className="font-note text-[11px] italic text-[var(--ink-soft)]">
         <EditableText id="book.dateNote" defaultValue="someone wonderful was born on this day" />
@@ -116,7 +116,7 @@ function pages(): React.ReactNode[] {
       <PhotoFrame id="b.date2" ratio="3 / 4" pin rotate={2} />
     </div>,
 
-    // 7 — photo strip
+    // 7: photo strip
     <div key="p7" className="flex h-full flex-col justify-center gap-2">
       <Kicker>film strip</Kicker>
       <div className="flex flex-col gap-1 bg-[var(--ink)] p-1.5">
@@ -138,7 +138,7 @@ function pages(): React.ReactNode[] {
       </p>
     </div>,
 
-    // 9 — social post
+    // 9: social post
     <div key="p9" className="flex h-full flex-col justify-center">
       <div className="border border-[var(--paper-shade)] bg-[var(--paper)] shadow-sm">
         <div className="flex items-center gap-2 border-b border-[var(--paper-shade)] px-2 py-1.5">
@@ -170,7 +170,7 @@ function pages(): React.ReactNode[] {
       <PhotoFrame id="b.post2" ratio="4 / 5" pin rotate={-1.6} />
     </div>,
 
-    // 11 — things I love
+    // 11: things I love
     <div key="p11" className="flex h-full flex-col justify-center gap-2">
       <h3 className="font-display text-xl text-[var(--pin-red)]">
         Things I love about <EditableText id="book.loveWho" defaultValue="you" />
@@ -189,7 +189,7 @@ function pages(): React.ReactNode[] {
       <PhotoFrame id="b.love" ratio="3 / 4" pin rotate={2.4} className="w-4/5" />
     </div>,
 
-    // 13 — welcome to 23
+    // 13: welcome to 23
     <div key="p13" className="flex h-full flex-col justify-center gap-3">
       <p className="font-script text-3xl text-[var(--pin-red)]">
         Welcome to <EditableText id="book.age" defaultValue="23" />
@@ -211,7 +211,7 @@ function pages(): React.ReactNode[] {
       <PhotoFrame id="b.age2" ratio="3 / 4" pin rotate={1.8} />
     </div>,
 
-    // 15 — today's movie
+    // 15: today's movie
     <div key="p15" className="flex h-full flex-col justify-center gap-3">
       <h3 className="font-display text-2xl uppercase tracking-wide text-[var(--pin-red)]">
         Today&apos;s Movie

@@ -137,7 +137,7 @@ create policy "admin delete messages"  on public.contact_messages for delete usi
 -- so the site keeps working exactly as-is once wired to Supabase.
 -- ============================================================
 insert into public.templates (id, name, monogram, category, description, features, price, badge, screenshots, demo_url, sort_order) values
-('birthday-scrapbook','Birthday Scrapbook — Photo Collage','BS','birthday','Editable birthday scrapbook with a pinned photo collage page and a real flip-through book — upload your own photos and rewrite every caption.',
+('birthday-scrapbook','Birthday Scrapbook: Photo Collage','BS','birthday','Editable birthday scrapbook with a pinned photo collage page and a real flip-through book. Upload your own photos and rewrite every caption.',
   '{"Upload your own photos","Every caption editable","2 pages: collage + flip book","Drag, zoom & pin photos","Saves in the browser","Mobile + desktop ready"}',199,'trending','{"01","02","03"}','#',1),
 ('birthday-balloon-pop','Balloon Pop','BP','birthday','Playful balloon-popping birthday surprise page with tap-to-reveal message.',
   '{"Tap interaction","Custom message","Confetti burst","Shareable link"}',149,'new','{"01","02"}',null,2),
@@ -164,7 +164,7 @@ insert into public.templates (id, name, monogram, category, description, feature
 on conflict (id) do nothing;
 
 insert into public.my_products (id, name, monogram, description, features, stack, status, live_url, learn_more_url, sort_order) values
-('notiq','NOTIQ','NQ','Sticky notes reimagined — persistent, keyboard-friendly, and fast.',
+('notiq','NOTIQ','NQ','Sticky notes reimagined: persistent, keyboard-friendly, and fast.',
   '{"Local persistence","Keyboard shortcuts","Dark mode","Export"}','{"React","TypeScript","Tailwind"}','live','https://github.com/abhyanshu2',null,1),
 ('habit-tracker','Habit Tracker','HT','Track daily habits with streaks, heat-maps and weekly insights.',
   '{"Streaks","Heatmap","Weekly review","Reminders"}','{"React","Node.js","MongoDB"}','live','https://github.com/abhyanshu2',null,2),

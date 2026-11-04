@@ -57,7 +57,7 @@ export function OrdersPanel() {
         <div style={{ color: "rgba(245,242,236,0.5)", fontSize: 13 }}>Loading…</div>
       ) : rows.length === 0 ? (
         <div style={{ color: "rgba(245,242,236,0.4)", fontSize: 13 }}>
-          No orders yet — these show up automatically when someone clicks "Buy Now" in the store.
+          No orders yet. These show up automatically when someone clicks "Buy Now" in the store.
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

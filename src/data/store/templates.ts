@@ -25,11 +25,11 @@ export const TEMPLATES: Template[] = [
   // ---------- BIRTHDAY (5) ----------
   {
     id: "birthday-scrapbook",
-    name: "Birthday Scrapbook — Photo Collage",
+    name: "Birthday Scrapbook: Photo Collage",
     monogram: "BS",
     category: "birthday",
     description:
-      "Editable birthday scrapbook with a pinned photo collage page and a real flip-through book — upload your own photos and rewrite every caption.",
+      "Editable birthday scrapbook with a pinned photo collage page and a real flip-through book. Upload your own photos and rewrite every caption.",
     features: [
       "Upload your own photos",
       "Every caption editable",
