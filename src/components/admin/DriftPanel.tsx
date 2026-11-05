@@ -82,10 +82,10 @@ const card: CSSProperties = {
   marginBottom: 20,
 };
 const smallLabel: CSSProperties = {
-  fontFamily: "'JetBrains Mono', monospace",
-  fontSize: 10,
-  letterSpacing: ".06em",
-  textTransform: "uppercase",
+  fontFamily: "'Space Grotesk', sans-serif",
+  fontSize: 13.5,
+  fontWeight: 600,
+  letterSpacing: 0,
   color: "var(--muted)",
 };
 
@@ -290,10 +290,16 @@ export function DriftPanel() {
   return (
     <div>
       <div className="admin-section-head">
-        <h2 className="admin-section-title">
-          Hero Wall
-          <span className="admin-section-count">({rows.length} photos)</span>
-        </h2>
+        <div>
+          <h2 className="admin-section-title">
+            Hero Wall
+            <span className="admin-section-count">{rows.length} photos</span>
+          </h2>
+          <p className="admin-section-desc">
+            The photo wall behind your name on the homepage. Add photos, change their order and
+            choose how each one is cropped.
+          </p>
+        </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           {uploadInfo && <span style={smallLabel}>{uploadInfo}</span>}
           <input
@@ -513,8 +519,9 @@ export function DriftPanel() {
                     borderRadius: 999,
                     background: "rgba(0,0,0,.65)",
                     color: "#fff",
-                    fontSize: 10,
-                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    fontFamily: "'Space Grotesk', sans-serif",
                   }}
                 >
                   #{i + 1}

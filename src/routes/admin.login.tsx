@@ -13,6 +13,7 @@ function AdminLoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -31,56 +32,52 @@ function AdminLoginPage() {
 
   return (
     <div className="admin-login-wrap">
-      <Link
-        to="/"
-        aria-label="Close"
-        style={{
-          position: "absolute",
-          top: 22,
-          right: 26,
-          width: 34,
-          height: 34,
-          borderRadius: "50%",
-          border: "1px solid var(--border-strong)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "var(--text)",
-          textDecoration: "none",
-          fontSize: 16,
-          zIndex: 2,
-        }}
-      >
-        ✕
+      <Link to="/" className="admin-login-close">
+        ← Back to site
       </Link>
       <form onSubmit={handleSubmit} className="admin-login-card">
-        <div className="admin-login-mark">CUSTOM ID STUDIO</div>
-        <h1 className="admin-login-title">Admin Login</h1>
-        <p className="admin-login-sub">Sign in to manage templates, products, orders & messages.</p>
+        <div className="admin-login-mark">PORTFOLIO ADMIN</div>
+        <h1 className="admin-login-title">Welcome back</h1>
+        <p className="admin-login-sub">
+          Sign in to manage your projects, store, orders and messages.
+        </p>
 
         <div className="admin-field">
-          <label className="admin-label">Email</label>
+          <label className="admin-label" htmlFor="login-email">
+            Email address
+          </label>
           <input
+            id="login-email"
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="admin-input"
+            placeholder="you@example.com"
             autoComplete="email"
             autoFocus
           />
         </div>
 
         <div className="admin-field">
-          <label className="admin-label">Password</label>
-          <input
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="admin-input"
-            autoComplete="current-password"
-          />
+          <label className="admin-label" htmlFor="login-password">
+            Password
+          </label>
+          <div className="admin-pw">
+            <input
+              id="login-password"
+              type={showPassword ? "text" : "password"}
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="admin-input"
+              placeholder="Enter your password"
+              autoComplete="current-password"
+            />
+            <button type="button" onClick={() => setShowPassword((v) => !v)}>
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
         </div>
 
         {error && <p className="admin-error">{error}</p>}
@@ -91,7 +88,7 @@ function AdminLoginPage() {
           className="admin-btn-primary"
           style={{ width: "100%", marginTop: 6 }}
         >
-          {loading ? "Signing in…" : "Sign In"}
+          {loading ? "Signing in…" : "Sign in"}
         </button>
       </form>
     </div>
