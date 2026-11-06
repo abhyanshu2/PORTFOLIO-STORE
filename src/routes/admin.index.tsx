@@ -245,4 +245,4 @@ function FullscreenMsg({ text }: { text: string }) {
       {text}
     </div>
   );
-}
+} 

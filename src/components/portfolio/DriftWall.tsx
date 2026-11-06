@@ -53,6 +53,8 @@ export interface DriftWallProps {
   dim?: number;
   grayscale?: boolean;
   overlayColor?: string;
+  /** How strong the overlay tint is, 0 to 1 (default 0.42). */
+  overlayOpacity?: number;
   className?: string;
   style?: CSSProperties;
 }
@@ -106,6 +108,7 @@ const DriftWall = ({
   dim = 0.55,
   grayscale = false,
   overlayColor = "#060010",
+  overlayOpacity = 0.42,
   className = "",
   style,
 }: DriftWallProps) => {
@@ -314,6 +317,7 @@ const DriftWall = ({
         "--dw-dim": dim,
         "--dw-gray": grayscale ? 1 : 0,
         "--dw-overlay": overlayColor,
+        "--dw-overlay-o": overlayOpacity,
         "--dw-edge": `${Math.max(0, (1 - fade) * 100)}%`,
         "--dw-side": `${Math.round(Math.max(0, fade) * 22)}%`,
         "--dw-edge-v": `${Math.round((1 - fade) * 100 + 5)}%`,
@@ -334,6 +338,7 @@ const DriftWall = ({
       dim,
       grayscale,
       overlayColor,
+      overlayOpacity,
       fade,
       perspective,
       maskStyle,
@@ -361,7 +366,7 @@ const DriftWall = ({
     "group-[.is-active]/tile:[filter:grayscale(0)_saturate(1.05)] group-focus-visible/tile:[filter:grayscale(0)_saturate(1.05)]",
   );
   const overlayClass = cx(
-    "pointer-events-none absolute inset-0 bg-[var(--dw-overlay)] opacity-[0.42]",
+    "pointer-events-none absolute inset-0 bg-[var(--dw-overlay)] opacity-[var(--dw-overlay-o)]",
     "transition-opacity duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
     "group-[.is-active]/tile:opacity-0 group-focus-visible/tile:opacity-0",
   );

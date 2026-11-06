@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { uploadMediaFile } from "@/lib/upload-media";
 import {
   DEFAULT_DRIFT_SETTINGS,
+  driftWallProps,
   mapSettings,
   rowToItem,
   type DriftImageRow,
@@ -55,24 +56,65 @@ function cropStyle(r: Pick<DriftImageRow, "fit" | "focus_x" | "focus_y" | "zoom"
   };
 }
 
-const SETTING_FIELDS: {
-  key: keyof DriftSettings;
-  label: string;
-  min: number;
-  max: number;
-  step: number;
-  unit?: string;
-}[] = [
-  { key: "columns", label: "Columns", min: 2, max: 8, step: 1 },
-  { key: "tile_width", label: "Tile width", min: 120, max: 320, step: 5, unit: "px" },
-  { key: "tile_height", label: "Tile height", min: 80, max: 240, step: 4, unit: "px" },
-  { key: "gap", label: "Gap between photos", min: 4, max: 40, step: 1, unit: "px" },
-  { key: "radius", label: "Corner roundness", min: 0, max: 40, step: 1, unit: "px" },
-  { key: "speed", label: "Drift speed", min: 0, max: 80, step: 1 },
-  { key: "tilt", label: "Tilt (up / down)", min: 0, max: 40, step: 1, unit: "°" },
-  { key: "turn", label: "Turn (left / right)", min: -40, max: 40, step: 1, unit: "°" },
-  { key: "dim", label: "Photo brightness when idle", min: 0.2, max: 1, step: 0.05 },
+type NumKey = {
+  [K in keyof DriftSettings]: DriftSettings[K] extends number ? K : never;
+}[keyof DriftSettings];
+
+type Control =
+  | { kind: "color"; key: "overlay_color"; label: string }
+  | { kind: "range"; key: NumKey; label: string; min: number; max: number; step: number; unit?: string }
+  | { kind: "select"; key: "direction"; label: string; options: { value: string; label: string }[] }
+  | { kind: "toggle"; key: "pause_on_hover" | "grayscale"; label: string };
+
+// Same controls and order as the "Customize" panel
+const CONTROLS: Control[] = [
+  { kind: "color", key: "overlay_color", label: "Overlay" },
+  { kind: "range", key: "overlay_opacity", label: "Overlay Opacity", min: 0, max: 1, step: 0.05 },
+  { kind: "range", key: "columns", label: "Columns", min: 2, max: 8, step: 1 },
+  { kind: "range", key: "tile_width", label: "Tile Width", min: 100, max: 400, step: 5, unit: "px" },
+  { kind: "range", key: "tile_height", label: "Tile Height", min: 60, max: 300, step: 2, unit: "px" },
+  { kind: "range", key: "gap", label: "Gap", min: 0, max: 60, step: 1, unit: "px" },
+  { kind: "range", key: "radius", label: "Radius", min: 0, max: 60, step: 1, unit: "px" },
+  {
+    kind: "select",
+    key: "direction",
+    label: "Direction",
+    options: [
+      { value: "up", label: "Up" },
+      { value: "down", label: "Down" },
+    ],
+  },
+  { kind: "range", key: "speed", label: "Speed", min: 0, max: 120, step: 1 },
+  { kind: "range", key: "variance", label: "Variance", min: 0, max: 1, step: 0.05 },
+  { kind: "range", key: "tilt", label: "Tilt", min: -60, max: 60, step: 1, unit: "°" },
+  { kind: "range", key: "turn", label: "Turn", min: -60, max: 60, step: 1, unit: "°" },
+  { kind: "range", key: "roll", label: "Roll", min: -45, max: 45, step: 1, unit: "°" },
+  { kind: "range", key: "perspective", label: "Perspective", min: 300, max: 3000, step: 50, unit: "px" },
+  { kind: "range", key: "depth", label: "Depth", min: 0, max: 400, step: 5, unit: "px" },
+  { kind: "range", key: "parallax", label: "Parallax", min: 0, max: 2, step: 0.05 },
+  { kind: "range", key: "lift", label: "Lift", min: 0, max: 200, step: 2, unit: "px" },
+  { kind: "range", key: "fade", label: "Fade", min: 0, max: 1, step: 0.05 },
+  { kind: "range", key: "dim", label: "Dim", min: 0, max: 1, step: 0.05 },
+  { kind: "toggle", key: "pause_on_hover", label: "Pause on Hover" },
+  { kind: "toggle", key: "grayscale", label: "Grayscale" },
 ];
+
+const fmt = (v: number) => String(Number(v.toFixed(2)));
+
+function labelOf(key: keyof DriftSettings): string {
+  if (key === "enabled") return "Show the wall";
+  return CONTROLS.find((c) => c.key === key)?.label ?? String(key);
+}
+
+// How a value is shown to the person, for example "40°", "Down", "On", "Auto"
+function valueText(key: keyof DriftSettings, v: unknown): string {
+  const c = CONTROLS.find((x) => x.key === key);
+  if (key === "enabled" || typeof v === "boolean") return v ? "On" : "Off";
+  if (c?.kind === "select") return c.options.find((o) => o.value === v)?.label ?? String(v);
+  if (key === "overlay_color") return String(v) || "Auto";
+  if (typeof v === "number") return fmt(v) + (c?.kind === "range" ? (c.unit ?? "") : "");
+  return String(v);
+}
 
 const card: CSSProperties = {
   border: "1px solid var(--border)",
@@ -92,7 +134,12 @@ const smallLabel: CSSProperties = {
 export function DriftPanel() {
   const [rows, setRows] = useState<DriftImageRow[]>([]);
   const [settings, setSettings] = useState<DriftSettings>(DEFAULT_DRIFT_SETTINGS);
-  const [settingsDirty, setSettingsDirty] = useState(false);
+  const [, setSettingsDirty] = useState(false);
+  // what is saved right now (what visitors see), so we can show what you changed
+  const [saved, setSaved] = useState<DriftSettings>(DEFAULT_DRIFT_SETTINGS);
+  const [lastChange, setLastChange] = useState<{ label: string; from: string; to: string } | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -122,7 +169,10 @@ export function DriftPanel() {
     else setError(null);
     setRows((imgs.data as DriftImageRow[]) || []);
     if (!sets.error) {
-      setSettings(mapSettings(sets.data));
+      const m = mapSettings(sets.data);
+      setSettings(m);
+      setSaved(m);
+      setLastChange(null);
       setSettingsDirty(false);
     }
     setLoading(false);
@@ -263,6 +313,11 @@ export function DriftPanel() {
 
   // ---------- wall settings ----------
   function setSetting<K extends keyof DriftSettings>(key: K, value: DriftSettings[K]) {
+    setLastChange({
+      label: labelOf(key),
+      from: valueText(key, saved[key]),
+      to: valueText(key, value),
+    });
     setSettings((s) => ({ ...s, [key]: value }));
     setSettingsDirty(true);
   }
@@ -274,8 +329,101 @@ export function DriftPanel() {
     if (err) setError(explain(err.message));
     else {
       setSettingsDirty(false);
+      setSaved(settings);
+      setLastChange(null);
       setNotice("Wall settings saved");
     }
+  }
+
+  const changeList = [
+    { key: "enabled" as keyof DriftSettings, label: "Show the wall" },
+    ...CONTROLS.map((c) => ({ key: c.key as keyof DriftSettings, label: c.label })),
+  ].filter((x) => settings[x.key] !== saved[x.key]);
+  const changedKeys = new Set<string>(changeList.map((x) => x.key));
+
+  function renderControl(c: Control) {
+    const tileClass = (extra: string) =>
+      `dw-tile ${extra}${changedKeys.has(c.key) ? " changed" : ""}`.replace("  ", " ");
+    if (c.kind === "range") {
+      const v = Number(settings[c.key]);
+      const pct = clamp(((v - c.min) / (c.max - c.min)) * 100, 0, 100);
+      return (
+        <label key={c.key} className={tileClass("dw-range")}>
+          <span className="dw-fill" style={{ width: `${pct}%` }} />
+          <span className="dw-name">{c.label}</span>
+          <span className="dw-val">
+            {fmt(v)}
+            {c.unit ?? ""}
+          </span>
+          <input
+            type="range"
+            aria-label={c.label}
+            min={c.min}
+            max={c.max}
+            step={c.step}
+            value={v}
+            onChange={(e) => setSetting(c.key, Number(e.target.value) as never)}
+          />
+        </label>
+      );
+    }
+    if (c.kind === "toggle") {
+      return (
+        <label key={c.key} className={tileClass("dw-click")}>
+          <span className="dw-name">{c.label}</span>
+          <span className="dw-switch">
+            <input
+              type="checkbox"
+              role="switch"
+              checked={settings[c.key]}
+              onChange={(e) => setSetting(c.key, e.target.checked)}
+            />
+            <i />
+          </span>
+        </label>
+      );
+    }
+    if (c.kind === "select") {
+      return (
+        <label key={c.key} className={tileClass("dw-click")}>
+          <span className="dw-name">{c.label}</span>
+          <select
+            className="dw-select"
+            value={settings[c.key]}
+            onChange={(e) => setSetting(c.key, e.target.value as DriftSettings["direction"])}
+          >
+            {c.options.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      );
+    }
+    const hex = /^#[0-9a-f]{6}$/i.test(settings.overlay_color) ? settings.overlay_color : "#060010";
+    return (
+      <div key={c.key} className={tileClass("")}>
+        <span className="dw-name">{c.label}</span>
+        <span className="dw-color">
+          <input
+            type="color"
+            aria-label="Pick overlay colour"
+            value={hex}
+            onChange={(e) => setSetting("overlay_color", e.target.value)}
+          />
+          <input
+            type="text"
+            aria-label="Overlay colour"
+            placeholder="Auto"
+            maxLength={32}
+            spellCheck={false}
+            value={settings.overlay_color}
+            onChange={(e) => setSetting("overlay_color", e.target.value)}
+          />
+        </span>
+      </div>
+    );
   }
 
   // size of the crop box in the edit window, same shape as a real tile
@@ -325,152 +473,122 @@ export function DriftPanel() {
         <div style={{ ...smallLabel, color: "var(--accent2)", marginBottom: 14 }}>{notice}</div>
       )}
 
-      {/* live preview */}
-      <div style={{ ...smallLabel, marginBottom: 8 }}>Live preview (same wall as the homepage)</div>
-      <div
-        style={{
-          position: "relative",
-          height: 380,
-          overflow: "hidden",
-          borderRadius: 16,
-          border: "1px solid var(--border-strong)",
-          background: "var(--bg)",
-          marginBottom: 20,
-        }}
-      >
-        {!loading && (
-          <DriftWall
-            items={previewItems}
-            columns={settings.columns}
-            tileWidth={settings.tile_width}
-            tileHeight={settings.tile_height}
-            gap={settings.gap}
-            radius={settings.radius}
-            tilt={settings.tilt}
-            turn={settings.turn}
-            speed={settings.speed}
-            dim={settings.dim}
-            perspective={1200}
-            depth={120}
-            variance={0.45}
-            parallax={0.6}
-            lift={64}
-            fade={0.6}
-            overlayColor="var(--bg)"
-          />
-        )}
-        {!loading && rows.length === 0 && (
-          <div
-            className="admin-empty"
-            style={{
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              textAlign: "center",
-              padding: 24,
-            }}
-          >
-            No photos yet. The homepage shows sample photos until you add your own.
+      <div className="dw-studio">
+        {/* left: live preview + what you changed. It stays on screen while you scroll the settings. */}
+        <div className="dw-preview-col">
+          <div className="dw-preview-title">
+            <span>Live preview</span>
+            <span className="dw-preview-sub">Updates as you move a slider</span>
           </div>
-        )}
-      </div>
+          <div className="dw-preview-box">
+            {!loading && <DriftWall items={previewItems} {...driftWallProps(settings)} maskMode="open-top" />}
+            {!loading && rows.length === 0 && (
+              <div className="admin-empty dw-preview-empty">
+                No photos yet. The homepage shows sample photos until you add your own.
+              </div>
+            )}
+            {lastChange && (
+              <div className="dw-badge" aria-live="polite">
+                <b>{lastChange.label}</b>
+                <span>{lastChange.from}</span>
+                <i>→</i>
+                <strong>{lastChange.to}</strong>
+              </div>
+            )}
+          </div>
 
-      {/* wall settings */}
-      <div style={card}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: 12,
-            marginBottom: 16,
-          }}
-        >
-          <div className="admin-card-title">Wall settings</div>
-          <label
+          <div className="dw-changes">
+            {changeList.length === 0 ? (
+              <span className="admin-dim">No changes. This is what visitors see now.</span>
+            ) : (
+              <>
+                <div className="dw-changes-title">
+                  {changeList.length} unsaved change{changeList.length > 1 ? "s" : ""}
+                </div>
+                <div className="dw-chips">
+                  {changeList.map((x) => (
+                    <span key={x.key} className="dw-chip">
+                      <b>{x.label}</b>
+                      {valueText(x.key, saved[x.key])}
+                      <i>→</i>
+                      <strong>{valueText(x.key, settings[x.key])}</strong>
+                    </span>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="dw-actions">
+            <button
+              className="admin-btn-primary"
+              disabled={busy === "settings"}
+              onClick={saveSettings}
+            >
+              {busy === "settings" ? "Saving…" : "Save settings"}
+            </button>
+            <button
+              className="admin-btn-ghost"
+              disabled={changeList.length === 0}
+              onClick={() => {
+                setSettings(saved);
+                setSettingsDirty(false);
+                setLastChange(null);
+              }}
+            >
+              Undo changes
+            </button>
+            <button
+              className="admin-btn-ghost"
+              onClick={() => {
+                setSettings(DEFAULT_DRIFT_SETTINGS);
+                setSettingsDirty(true);
+                setLastChange(null);
+              }}
+            >
+              Reset to default
+            </button>
+          </div>
+        </div>
+
+        {/* right: all the settings */}
+        <div style={card}>
+          <div
             style={{
               display: "flex",
+              justifyContent: "space-between",
               alignItems: "center",
-              gap: 8,
-              fontSize: 13,
-              cursor: "pointer",
+              flexWrap: "wrap",
+              gap: 12,
+              marginBottom: 16,
             }}
           >
-            <input
-              type="checkbox"
-              checked={settings.enabled}
-              onChange={(e) => setSetting("enabled", e.target.checked)}
-              style={{ accentColor: "var(--accent)" }}
-            />
-            Show the wall on the homepage
-          </label>
-        </div>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))",
-            gap: "14px 28px",
-          }}
-        >
-          {SETTING_FIELDS.map((f) => (
-            <div key={f.key}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  ...smallLabel,
-                  marginBottom: 6,
-                }}
-              >
-                <span>{f.label}</span>
-                <span style={{ color: "var(--accent2)" }}>
-                  {Number(settings[f.key])}
-                  {f.unit ?? ""}
-                </span>
-              </div>
+            <div className="admin-card-title">Customize</div>
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                fontSize: 13,
+                cursor: "pointer",
+              }}
+            >
               <input
-                type="range"
-                min={f.min}
-                max={f.max}
-                step={f.step}
-                value={Number(settings[f.key])}
-                onChange={(e) => setSetting(f.key, Number(e.target.value) as never)}
-                style={{ width: "100%", accentColor: "var(--accent)" }}
+                type="checkbox"
+                checked={settings.enabled}
+                onChange={(e) => setSetting("enabled", e.target.checked)}
+                style={{ accentColor: "var(--accent)" }}
               />
-            </div>
-          ))}
-        </div>
-        <div
-          style={{
-            display: "flex",
-            gap: 10,
-            marginTop: 18,
-            alignItems: "center",
-            flexWrap: "wrap",
-          }}
-        >
-          <button
-            className="admin-btn-primary"
-            disabled={busy === "settings"}
-            onClick={saveSettings}
-          >
-            {busy === "settings" ? "Saving…" : "Save settings"}
-          </button>
-          <button
-            className="admin-btn-ghost"
-            onClick={() => {
-              setSettings(DEFAULT_DRIFT_SETTINGS);
-              setSettingsDirty(true);
-            }}
-          >
-            Reset to default
-          </button>
-          {settingsDirty && (
-            <span style={{ ...smallLabel, color: "var(--accent2)" }}>Unsaved changes</span>
-          )}
+              Show the wall on the homepage
+            </label>
+          </div>
+          <div className="dw-grid">{CONTROLS.map(renderControl)}</div>
+          <div className="admin-hint" style={{ marginTop: 12 }}>
+            Photos too dark? Raise Dim (higher is brighter) and lower Overlay Opacity (lower is
+            brighter). Overlay is the tint colour: leave it empty for Auto, which follows your page
+            background in dark and light theme. Settings marked with a dot are changed but not saved
+            yet.
+          </div>
         </div>
       </div>
 

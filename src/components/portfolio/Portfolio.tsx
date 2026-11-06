@@ -5,11 +5,48 @@ import { ExperienceSection } from "./ExperienceSection";
 import { PixelWipe, type PixelWipeHandle } from "./PixelWipe";
 import DriftWall from "./DriftWall";
 import TechText from "./TechText";
-import { useDriftWall } from "@/lib/drift-wall";
+import { driftWallProps, useDriftWall } from "@/lib/drift-wall";
 import { useProjects } from "@/lib/use-store-data";
 
 
 type Props = { onOpenStore: () => void };
+
+// The animated name in the hero. The wall behind it starts at the letter "S".
+const NAME_TEXT = "ABHYANSHU";
+const NAME_WEIGHT = 900;
+const NAME_SIZE = 400;
+const NAME_SPACING = -0.025;
+const WALL_START_LETTER = NAME_TEXT.indexOf("S"); // change "S" to start the wall at another letter
+
+/**
+ * Where one letter of the name starts (px from the left edge of the name box).
+ * Uses the same layout rules as TechText, so it lands exactly on the drawn letter.
+ */
+function letterLeft(boxW: number, boxH: number, index: number, family: string): number | null {
+  const probe = document.createElement("canvas").getContext("2d");
+  if (!probe || index < 0) return null;
+  const setFont = (size: number) => {
+    probe.font = `${NAME_WEIGHT} ${size}px ${family}`;
+    if ("letterSpacing" in probe) {
+      (probe as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing =
+        `${NAME_SPACING * size}px`;
+    }
+    probe.textAlign = "left";
+    probe.textBaseline = "alphabetic";
+  };
+  setFont(NAME_SIZE);
+  const first = probe.measureText(NAME_TEXT);
+  const inkW = first.actualBoundingBoxLeft + first.actualBoundingBoxRight;
+  const inkH = first.actualBoundingBoxAscent + first.actualBoundingBoxDescent;
+  const fit = Math.min(1, (boxW * 0.9) / Math.max(inkW, 1), (boxH * 0.66) / Math.max(inkH, 1));
+  const size = NAME_SIZE * fit;
+  setFont(size);
+  const word = probe.measureText(NAME_TEXT);
+  const x = boxW * 0.05 + word.actualBoundingBoxLeft;
+  const own = probe.measureText(NAME_TEXT[index]);
+  const upToLetter = probe.measureText(NAME_TEXT.slice(0, index + 1));
+  return x + upToLetter.width - own.width - own.actualBoundingBoxLeft;
+}
 
 export function Portfolio({ onOpenStore }: Props) {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
@@ -33,11 +70,23 @@ export function Portfolio({ onOpenStore }: Props) {
       const heroBox = hero.getBoundingClientRect();
       const titleBox = title.getBoundingClientRect();
       const techBox = tech?.getBoundingClientRect();
-      const nameRight = techBox ? techBox.left + techBox.width * 0.95 : titleBox.right;
-      hero.style.setProperty("--drift-left", `${Math.round(nameRight - heroBox.left)}px`);
+      const sLeft =
+        tech && techBox
+          ? letterLeft(
+              techBox.width,
+              techBox.height,
+              WALL_START_LETTER,
+              getComputedStyle(tech).fontFamily,
+            )
+          : null;
+      const wallStart = techBox && sLeft !== null ? techBox.left + sLeft : titleBox.right;
+      hero.style.setProperty("--drift-left", `${Math.round(wallStart - heroBox.left)}px`);
       hero.style.setProperty("--drift-top", `${nav ? nav.offsetHeight : 88}px`);
     };
     update();
+    // measure again once the name font has finished loading
+    const family = tech ? getComputedStyle(tech).fontFamily : "";
+    document.fonts?.load(`${NAME_WEIGHT} 64px ${family}`, NAME_TEXT).then(update, update);
     const observer = new ResizeObserver(update);
     observer.observe(title);
     if (tech) observer.observe(tech);
@@ -209,27 +258,8 @@ export function Portfolio({ onOpenStore }: Props) {
           <div className="hero-drift" aria-hidden="true">
             <DriftWall
               items={drift.items}
-              columns={drift.settings.columns}
-              tileWidth={drift.settings.tile_width}
-              tileHeight={drift.settings.tile_height}
-              gap={drift.settings.gap}
-              radius={drift.settings.radius}
-              tilt={drift.settings.tilt}
-              turn={drift.settings.turn}
-              roll={0}
-              perspective={1200}
-              depth={120}
-              speed={drift.settings.speed}
-              direction="up"
-              variance={0.45}
-              parallax={0.6}
-              lift={64}
-              fade={0.6}
+              {...driftWallProps(drift.settings)}
               maskMode="open-top"
-              dim={drift.settings.dim}
-              overlayColor="var(--bg)"
-              pauseOnHover={false}
-              grayscale={false}
             />
           </div>
         )}
@@ -241,10 +271,10 @@ export function Portfolio({ onOpenStore }: Props) {
         <h1 className="hero-title">
           <span className="hero-tech">
             <TechText
-              text="ABHYANSHU"
-              fontWeight={900}
-              fontSize={400}
-              letterSpacing={-0.025}
+              text={NAME_TEXT}
+              fontWeight={NAME_WEIGHT}
+              fontSize={NAME_SIZE}
+              letterSpacing={NAME_SPACING}
               align="left"
               reveal="letter"
               dashLength={4}
@@ -280,8 +310,6 @@ export function Portfolio({ onOpenStore }: Props) {
             </div>
           </div>
         </div>
-
-        <div className="scroll-indicator"><div className="scroll-line"></div>SCROLL</div>
       </section>
 
       {/* MARQUEE */}
