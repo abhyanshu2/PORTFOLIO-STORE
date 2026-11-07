@@ -4,6 +4,7 @@ import {
   Briefcase,
   Download,
   ExternalLink,
+  FileText,
   FolderOpen,
   Images,
   LayoutTemplate,
@@ -11,6 +12,8 @@ import {
   Mail,
   Package,
   ShoppingCart,
+  PanelLeftClose,
+  PanelLeftOpen,
   Wrench,
 } from "lucide-react";
 import { useAdminSession } from "@/lib/use-admin-session";
@@ -19,6 +22,7 @@ import { CrudTable } from "@/components/admin/CrudTable";
 import { OrdersPanel } from "@/components/admin/OrdersPanel";
 import { MessagesPanel } from "@/components/admin/MessagesPanel";
 import { DriftPanel } from "@/components/admin/DriftPanel";
+import { SiteContentPanel } from "@/components/admin/SiteContentPanel";
 import {
   TEMPLATES_CONFIG,
   MY_PRODUCTS_CONFIG,
@@ -44,6 +48,13 @@ type TabDef = {
 };
 
 const TABS = [
+  {
+    key: "content",
+    label: "Site Content",
+    group: "Portfolio",
+    icon: FileText,
+    desc: "Edit the text of your intro, about, skills, education, contact and store.",
+  },
   {
     key: "projects",
     label: "Projects",
@@ -117,6 +128,22 @@ function AdminDashboardPage() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<TabKey>("projects");
   const [counts, setCounts] = useState({ orders: 0, messages: 0 });
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    try {
+      setCollapsed(localStorage.getItem("admin-side-collapsed") === "1");
+    } catch {}
+  }, []);
+
+  const toggleSide = () =>
+    setCollapsed((c) => {
+      const next = !c;
+      try {
+        localStorage.setItem("admin-side-collapsed", next ? "1" : "0");
+      } catch {}
+      return next;
+    });
 
   useEffect(() => {
     if (!loading && !isAdmin) {
@@ -150,7 +177,7 @@ function AdminDashboardPage() {
     key === "orders" ? counts.orders : key === "messages" ? counts.messages : 0;
 
   return (
-    <div className="admin-shell">
+    <div className={`admin-shell${collapsed ? " side-collapsed" : ""}`}>
       <aside className="admin-side">
         <div className="admin-brand">
           <div className="admin-brand-mark">A</div>
@@ -187,8 +214,20 @@ function AdminDashboardPage() {
 
       <div className="admin-content">
         <header className="admin-topbar">
-          <div className="admin-crumb">
-            Admin / <b>{current.label}</b>
+          <div className="admin-topbar-left">
+            <button
+              type="button"
+              className="admin-side-toggle"
+              onClick={toggleSide}
+              aria-label={collapsed ? "Open admin panel" : "Close admin panel"}
+              title={collapsed ? "Open admin panel" : "Close admin panel"}
+              aria-expanded={!collapsed}
+            >
+              {collapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
+            </button>
+            <div className="admin-crumb">
+              Admin / <b>{current.label}</b>
+            </div>
           </div>
           <div className="admin-top-actions">
             <span className="admin-user">{session?.user.email}</span>
@@ -222,6 +261,7 @@ function AdminDashboardPage() {
           {tab === "services" && (
             <CrudTable config={SERVICES_CONFIG} description={current.desc} />
           )}
+          {tab === "content" && <SiteContentPanel />}
           {tab === "drift" && <DriftPanel />}
           {tab === "orders" && <OrdersPanel />}
           {tab === "messages" && <MessagesPanel />}
@@ -245,4 +285,4 @@ function FullscreenMsg({ text }: { text: string }) {
       {text}
     </div>
   );
-} 
+}

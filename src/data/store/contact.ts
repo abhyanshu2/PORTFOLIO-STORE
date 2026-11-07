@@ -11,12 +11,12 @@ export const STORE_CONTACT = [
   },
 ];
 
-export function buildWhatsAppUrl(productName: string): string {
+export function buildWhatsAppUrl(productName: string, number: string = WHATSAPP_NUMBER): string {
   const message = `Hello Abhyanshu,\n\nI want to purchase:\n\nProduct Name: ${productName}\n\nPlease share the payment details.`;
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }
 
-export function buildHireMeUrl(serviceName: string): string {
+export function buildHireMeUrl(serviceName: string, number: string = WHATSAPP_NUMBER): string {
   const message = `Hello Abhyanshu,\n\nI want to hire you for:\n\nService: ${serviceName}\n\nCan we discuss?`;
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }

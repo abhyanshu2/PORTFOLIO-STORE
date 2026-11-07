@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { CATEGORIES, type CategorySlug } from "@/data/store/categories";
 import type { Template } from "@/data/store/templates";
-import { STORE_CONTACT, buildHireMeUrl, buildWhatsAppUrl } from "@/data/store/contact";
+import { buildHireMeUrl, buildWhatsAppUrl } from "@/data/store/contact";
+import { useSiteContent } from "@/lib/site-content";
 import { useTemplates, useMyProducts, useResources, useServices } from "@/lib/use-store-data";
 import { supabase } from "@/lib/supabase";
 
@@ -57,6 +58,8 @@ export function StoreOverlay({ open, onClose }: Props) {
   const [activeSection, setActiveSection] = useState<string>("");
   const bodyRef = useRef<HTMLDivElement | null>(null);
 
+  const site = useSiteContent();
+  const st = site.store;
   const { data: TEMPLATES } = useTemplates();
   const { data: MY_PRODUCTS } = useMyProducts();
   const { data: RESOURCES } = useResources();
@@ -160,8 +163,8 @@ export function StoreOverlay({ open, onClose }: Props) {
       >
         <header className="st-header">
           <div className="st-logo">
-            Store
-            <small>by Abhyanshu</small>
+            {st.logo}
+            <small>{st.logoSub}</small>
           </div>
           <div className="st-tabs" role="group" aria-label="Store sections">
             {SECTIONS.map((s) => (
@@ -195,26 +198,23 @@ export function StoreOverlay({ open, onClose }: Props) {
           {/* HERO */}
           <section className="st-hero" id="store-hero">
             <div className="st-hero-copy">
-              <div className="st-eyebrow">Digital marketplace</div>
+              <div className="st-eyebrow">{st.eyebrow}</div>
               <h2 className="st-title">
-                Premium
-                <em>Templates</em>
+                {st.titleTop}
+                <em>{st.titleEm}</em>
               </h2>
-              <p className="st-hero-desc">
-                Handcrafted templates, apps and free resources for moments that matter. Pick what
-                you like and buy directly on WhatsApp.
-              </p>
+              <p className="st-hero-desc">{st.description}</p>
               <div className="st-hero-cta">
                 <button className="st-btn primary big" onClick={() => goTo("store-templates")}>
-                  Browse templates ↓
+                  {st.browseButton}
                 </button>
                 <a
                   className="st-btn big"
-                  href={STORE_CONTACT[0]?.href}
+                  href={st.contacts[0]?.href ?? `https://wa.me/${st.whatsappNumber}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Chat on WhatsApp ↗
+                  {st.whatsappButton}
                 </a>
               </div>
               <div className="st-stats">
@@ -239,9 +239,9 @@ export function StoreOverlay({ open, onClose }: Props) {
           <section className="st-section" id="store-templates">
             <div className="st-head">
               <div>
-                <div className="section-label">Browse catalog</div>
+                <div className="section-label">{st.sections.templates.label}</div>
                 <h3 className="st-h2">
-                  All <em>Templates</em>
+                  {st.sections.templates.top} <em>{st.sections.templates.em}</em>
                 </h3>
               </div>
               <div className="st-count">
@@ -288,9 +288,9 @@ export function StoreOverlay({ open, onClose }: Props) {
           <section className="st-section" id="store-products">
             <div className="st-head">
               <div>
-                <div className="section-label">Built by me</div>
+                <div className="section-label">{st.sections.products.label}</div>
                 <h3 className="st-h2">
-                  My <em>Products</em>
+                  {st.sections.products.top} <em>{st.sections.products.em}</em>
                 </h3>
               </div>
             </div>
@@ -351,9 +351,9 @@ export function StoreOverlay({ open, onClose }: Props) {
           <section className="st-section" id="store-resources">
             <div className="st-head">
               <div>
-                <div className="section-label">Free downloads</div>
+                <div className="section-label">{st.sections.resources.label}</div>
                 <h3 className="st-h2">
-                  Free <em>Resources</em>
+                  {st.sections.resources.top} <em>{st.sections.resources.em}</em>
                 </h3>
               </div>
             </div>
@@ -382,9 +382,9 @@ export function StoreOverlay({ open, onClose }: Props) {
           <section className="st-section" id="store-services">
             <div className="st-head">
               <div>
-                <div className="section-label">Hire me</div>
+                <div className="section-label">{st.sections.services.label}</div>
                 <h3 className="st-h2">
-                  My <em>Services</em>
+                  {st.sections.services.top} <em>{st.sections.services.em}</em>
                 </h3>
               </div>
             </div>
@@ -406,7 +406,7 @@ export function StoreOverlay({ open, onClose }: Props) {
                   <button
                     className="st-btn primary st-svc-btn"
                     onClick={() =>
-                      recordOrderAndOpen("service", s.id, s.name, s.price, buildHireMeUrl(s.name))
+                      recordOrderAndOpen("service", s.id, s.name, s.price, buildHireMeUrl(s.name, st.whatsappNumber))
                     }
                   >
                     Hire Me ↗
@@ -420,14 +420,14 @@ export function StoreOverlay({ open, onClose }: Props) {
           <section className="st-section" id="store-contact">
             <div className="st-head">
               <div>
-                <div className="section-label">Get in touch</div>
+                <div className="section-label">{st.sections.contact.label}</div>
                 <h3 className="st-h2">
-                  Let's <em>Connect</em>
+                  {st.sections.contact.top} <em>{st.sections.contact.em}</em>
                 </h3>
               </div>
             </div>
             <div className="st-contact-grid">
-              {STORE_CONTACT.map((c) => (
+              {st.contacts.map((c) => (
                 <a
                   key={c.label}
                   href={c.href}
@@ -448,7 +448,7 @@ export function StoreOverlay({ open, onClose }: Props) {
           </section>
 
           <footer className="st-footer">
-            © {new Date().getFullYear()} Abhyanshu Raj · Digital Store · Powered by WhatsApp
+            {st.footer.replace("{year}", String(new Date().getFullYear()))}
           </footer>
         </div>
       </div>
@@ -578,7 +578,7 @@ export function StoreOverlay({ open, onClose }: Props) {
                         preview.id,
                         preview.name,
                         preview.price,
-                        buildWhatsAppUrl(preview.name),
+                        buildWhatsAppUrl(preview.name, st.whatsappNumber),
                       )
                     }
                   >
@@ -635,6 +635,7 @@ function TemplateCard({
   onPreview: () => void;
 }) {
   const color = CATEGORY_COLORS[t.category] ?? "var(--accent)";
+  const waNumber = useSiteContent().store.whatsappNumber;
   return (
     <article className="st-card" style={{ "--cc": color, "--i": index } as CSSProperties}>
       <div className="st-cover">
@@ -669,7 +670,7 @@ function TemplateCard({
             <button
               className="st-btn primary"
               onClick={() =>
-                recordOrderAndOpen("template", t.id, t.name, t.price, buildWhatsAppUrl(t.name))
+                recordOrderAndOpen("template", t.id, t.name, t.price, buildWhatsAppUrl(t.name, waNumber))
               }
             >
               Buy Now

@@ -1,19 +1,6 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import { ContactForm } from "./ContactForm";
-import { WHATSAPP_NUMBER } from "@/data/store/contact";
-
-const EMAIL = "abhyanshu2@gmail.com";
-const LINKEDIN_URL = "https://linkedin.com/in/abhyanshu";
-// Put your resume PDF in the "public" folder with this name
-const RESUME_URL = "/resume.pdf";
-const CITY = "Vaishali, India";
-
-const SOCIALS = [
-  { label: "GitHub", href: "https://github.com/abhyanshu2" },
-  { label: "LinkedIn", href: LINKEDIN_URL },
-  { label: "Instagram", href: "https://instagram.com/_abhyanshu" },
-  { label: "WhatsApp", href: `https://wa.me/${WHATSAPP_NUMBER}` },
-];
+import { useSiteContent } from "@/lib/site-content";
 
 function useLocalTime() {
   const [time, setTime] = useState("");
@@ -37,6 +24,8 @@ function useLocalTime() {
 }
 
 export function ContactSection() {
+  const { contact: c } = useSiteContent();
+  const EMAIL = c.email;
   const [copied, setCopied] = useState(false);
   const time = useLocalTime();
 
@@ -60,7 +49,7 @@ export function ContactSection() {
       }}
     >
       <div className="fade-up" style={{ marginBottom: 40 }}>
-        <div className="section-label">06 contact</div>
+        <div className="section-label">{c.label}</div>
         <h2
           style={{
             fontFamily: "'Playfair Display', serif",
@@ -72,7 +61,7 @@ export function ContactSection() {
             marginBottom: 16,
           }}
         >
-          Let's Work Together
+          {c.heading}
         </h2>
         <p
           style={{
@@ -83,7 +72,7 @@ export function ContactSection() {
             fontWeight: 400,
           }}
         >
-          Open to full-stack internships, frontend roles, freelance UI/UX work and collaborations.
+          {c.text}
         </p>
       </div>
 
@@ -128,7 +117,7 @@ export function ContactSection() {
           <div style={card}>
             <div style={label}>Socials</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "8px 22px", marginTop: 4 }}>
-              {SOCIALS.map((s) => (
+              {c.socials.map((s) => (
                 <a
                   key={s.label}
                   href={s.href}
@@ -152,7 +141,7 @@ export function ContactSection() {
           >
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
               <span className="badge-dot" />
-              <span style={{ ...label, color: "#6ab04c", margin: 0 }}>Available</span>
+              <span style={{ ...label, color: "#6ab04c", margin: 0 }}>{c.availableText}</span>
             </div>
             <div
               style={{
@@ -163,10 +152,10 @@ export function ContactSection() {
                 marginBottom: 8,
               }}
             >
-              Open to new opportunities
+              {c.availableTitle}
             </div>
             <div style={{ fontSize: 12, color: "var(--muted)", lineHeight: 1.7 }}>
-              Full-Stack Internships · Frontend Roles · Freelance UI/UX
+              {c.availableTags}
             </div>
           </div>
         </div>
@@ -198,14 +187,14 @@ export function ContactSection() {
             maxWidth: 640,
           }}
         >
-          Open to Frontend / Full-Stack Roles
+          {c.closingTitle}
         </h2>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-          <a href={RESUME_URL} target="_blank" rel="noopener noreferrer" className="btn-primary">
-            View Resume ↗
+          <a href={c.resumeUrl} target="_blank" rel="noopener noreferrer" className="btn-primary">
+            {c.resumeButton}
           </a>
-          <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" className="btn-ghost">
-            LinkedIn ↗
+          <a href={c.linkedinUrl} target="_blank" rel="noopener noreferrer" className="btn-ghost">
+            {c.linkedinButton}
           </a>
         </div>
       </div>
@@ -225,10 +214,10 @@ export function ContactSection() {
         }}
       >
         <span>
-          Local time · {CITY}
+          Local time · {c.city}
           {time ? ` · ${time} IST` : ""}
         </span>
-        <span>© {new Date().getFullYear()} Abhyanshu Raj</span>
+        <span>© {new Date().getFullYear()} {c.footerName}</span>
       </div>
     </section>
   );

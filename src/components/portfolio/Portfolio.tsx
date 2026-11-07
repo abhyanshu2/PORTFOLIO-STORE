@@ -7,22 +7,27 @@ import DriftWall from "./DriftWall";
 import TechText from "./TechText";
 import { driftWallProps, useDriftWall } from "@/lib/drift-wall";
 import { useProjects } from "@/lib/use-store-data";
+import { rich, useSiteContent } from "@/lib/site-content";
 
 
 type Props = { onOpenStore: () => void };
 
-// The animated name in the hero. The wall behind it starts at the letter "S".
-const NAME_TEXT = "ABHYANSHU";
 const NAME_WEIGHT = 900;
 const NAME_SIZE = 400;
 const NAME_SPACING = -0.025;
-const WALL_START_LETTER = NAME_TEXT.indexOf("S"); // change "S" to start the wall at another letter
 
 /**
  * Where one letter of the name starts (px from the left edge of the name box).
  * Uses the same layout rules as TechText, so it lands exactly on the drawn letter.
  */
-function letterLeft(boxW: number, boxH: number, index: number, family: string): number | null {
+function letterLeft(
+  nameText: string,
+  boxW: number,
+  boxH: number,
+  index: number,
+  family: string,
+): number | null {
+  const NAME_TEXT = nameText;
   const probe = document.createElement("canvas").getContext("2d");
   if (!probe || index < 0) return null;
   const setFont = (size: number) => {
@@ -49,6 +54,9 @@ function letterLeft(boxW: number, boxH: number, index: number, family: string): 
 }
 
 export function Portfolio({ onOpenStore }: Props) {
+  const site = useSiteContent();
+  const NAME_TEXT = site.hero.firstName || " ";
+  const WALL_START_LETTER = NAME_TEXT.toUpperCase().indexOf((site.hero.wallLetter || "S").toUpperCase());
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const { data: projects } = useProjects();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -73,6 +81,7 @@ export function Portfolio({ onOpenStore }: Props) {
       const sLeft =
         tech && techBox
           ? letterLeft(
+              NAME_TEXT,
               techBox.width,
               techBox.height,
               WALL_START_LETTER,
@@ -93,7 +102,7 @@ export function Portfolio({ onOpenStore }: Props) {
     observer.observe(hero);
     if (nav) observer.observe(nav);
     return () => observer.disconnect();
-  }, []);
+  }, [NAME_TEXT, WALL_START_LETTER]);
 
   // Sync theme onto <html>
   useEffect(() => {
@@ -134,13 +143,15 @@ export function Portfolio({ onOpenStore }: Props) {
     }, { threshold: 0.08 });
     els.forEach((el) => obs.observe(el));
     return () => obs.disconnect();
-  }, []);
+  }, [site]);
 
   // Typing animation for role
+  const rolesList = site.hero.roles.filter((r) => r.trim());
+  const rolesKey = rolesList.join("|");
   useEffect(() => {
     const el = roleRef.current;
     if (!el) return;
-    const roles = ["Frontend Developer", "Backend Developer", "Web Developer", "Full Stack Developer"];
+    const roles = rolesList.length ? rolesList : [""];
     let cancelled = false;
     let idx = 0;
     const cursor = document.createElement("span");
@@ -176,7 +187,7 @@ export function Portfolio({ onOpenStore }: Props) {
       }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [rolesKey]);
 
   const toggleTheme = async () => {
     if (wiping) return;
@@ -227,7 +238,7 @@ export function Portfolio({ onOpenStore }: Props) {
 
       {/* NAV */}
       <nav id="nav" className={scrolled ? "scrolled" : ""}>
-        <a href="#" className="nav-logo">Abhyanshu</a>
+        <a href="#" className="nav-logo">{site.nav.logo}</a>
         <ul className="nav-links">
           <li><a href="#about">About</a></li>
           <li><a href="#skills">Skills</a></li>
@@ -242,7 +253,7 @@ export function Portfolio({ onOpenStore }: Props) {
             <div className="tog-track"><div className="tog-thumb"></div></div>
             <span className="tog-label">{theme === "dark" ? "LIGHT" : "DARK"}</span>
           </button>
-          <a href="#" className="nav-resume" onClick={(e) => { e.preventDefault(); openStore(); }}>Visit Store ↗</a>
+          <a href="#" className="nav-resume" onClick={(e) => { e.preventDefault(); openStore(); }}>{site.nav.storeButton}</a>
           <button className="hamburger" aria-label="Menu" onClick={() => setMenuOpen((v) => !v)} style={menuOpen ? { transform: "none" } : undefined}>
             <span></span><span></span><span></span>
           </button>
@@ -265,9 +276,9 @@ export function Portfolio({ onOpenStore }: Props) {
         )}
         <div className="hero-badge">
           <Link to="/admin/login" aria-label="Admin" className="badge-dot" style={{ cursor: "pointer" }}></Link>
-          OPEN TO OPPORTUNITIES
+          {site.hero.badge}
         </div>
-        <div className="hero-number">01 INTRODUCTION</div>
+        <div className="hero-number">{site.hero.number}</div>
         <h1 className="hero-title">
           <span className="hero-tech">
             <TechText
@@ -298,15 +309,15 @@ export function Portfolio({ onOpenStore }: Props) {
               sweep={false}
             />
           </span>
-          <span className="dim">Raj</span>
+          <span className="dim">{site.hero.lastName}</span>
         </h1>
         <div className="hero-subtitle-row">
           <div className="hero-role" ref={roleRef}></div>
           <div>
-            <p className="hero-desc"><strong>Building pixel-perfect interfaces</strong> with modern web technologies. Passionate about React, Next.js &amp; creating experiences that feel intentional. Based in <strong>Vaishali, Bihar</strong>.</p>
+            <p className="hero-desc">{rich(site.hero.description)}</p>
             <div className="hero-ctas">
-              <a href="#projects" className="btn-primary">View My Work</a>
-              <button type="button" className="btn-ghost" onClick={openStore} style={{ font: "inherit" }}>Visit Store ↗</button>
+              <a href="#projects" className="btn-primary">{site.hero.primaryButton}</a>
+              <button type="button" className="btn-ghost" onClick={openStore} style={{ font: "inherit" }}>{site.hero.storeButton}</button>
             </div>
           </div>
         </div>
@@ -316,8 +327,8 @@ export function Portfolio({ onOpenStore }: Props) {
       <div className="marquee-section">
         <div className="marquee-track">
           {Array.from({ length: 2 }).flatMap((_, i) => (
-            ["React", "Next.js 15", "TypeScript", "Node.js", "Tailwind CSS", "MongoDB", "Framer Motion", "Git / GitHub"].map((t) => (
-              <span key={`${i}-${t}`} className="marquee-item">{t} <span className="marquee-dot"></span></span>
+            site.marquee.map((t, n) => (
+              <span key={`${i}-${n}`} className="marquee-item">{t} <span className="marquee-dot"></span></span>
             ))
           ))}
         </div>
@@ -326,19 +337,18 @@ export function Portfolio({ onOpenStore }: Props) {
       {/* ABOUT */}
       <section className="about" id="about">
         <div className="about-left fade-up">
-          <div className="section-label">01 about</div>
-          <div className="big-text">WHO<br />I <em>AM.</em></div>
+          <div className="section-label">{site.about.label}</div>
+          <div className="big-text">{site.about.titleTop}<br />{site.about.titleBottom} <em>{site.about.titleEm}</em></div>
           <div className="stats-row">
-            <div className="stat"><span className="stat-num">2+</span><span className="stat-label">Years Learning</span></div>
-            <div className="stat"><span className="stat-num">4+</span><span className="stat-label">Projects Built</span></div>
-            <div className="stat"><span className="stat-num">10+</span><span className="stat-label">Tech Stack</span></div>
-            <div className="stat"><span className="stat-num">∞</span><span className="stat-label">Curiosity</span></div>
+            {site.about.stats.map((st, i) => (
+              <div key={i} className="stat"><span className="stat-num">{st.num}</span><span className="stat-label">{st.label}</span></div>
+            ))}
           </div>
         </div>
         <div className="about-right fade-up">
-          <p className="about-para">I'm a <strong>Diploma student in Computer Science & Engineering</strong> currently in my 4th semester. What started with HTML and CSS turned into a full-stack rabbit hole: React, Next.js, Node.js, MongoDB, and shipping real interfaces that feel intentional.</p>
-          <p className="about-para">Passionate about <strong>clean UI, modern design systems</strong>, and building things that actually work. Exploring Framer Motion, TypeScript, and scalable backend architectures.</p>
-          <p className="about-para">When I'm not coding, I'm <strong>watching tech YouTube</strong>, exploring new gadgets, or travelling. Based in <strong>Vaishali, Bihar</strong>, available for remote &amp; freelance opportunities.</p>
+          {site.about.paragraphs.map((t, i) => (
+            <p key={i} className="about-para">{rich(t)}</p>
+          ))}
         </div>
       </section>
 
@@ -346,21 +356,16 @@ export function Portfolio({ onOpenStore }: Props) {
       <section className="skills" id="skills">
         <div className="skills-header fade-up">
           <div>
-            <div className="section-label">02 skills</div>
-            <h2 className="skills-title">MY<br />TOOLKIT</h2>
+            <div className="section-label">{site.skills.label}</div>
+            <h2 className="skills-title">{site.skills.titleTop}<br />{site.skills.titleBottom}</h2>
           </div>
-          <p className="skills-desc">Things I build with daily, growing in, and rely on to design, ship, and iterate.</p>
+          <p className="skills-desc">{site.skills.description}</p>
         </div>
         <div className="skills-grid fade-up">
-          {[
-            ["Frontend", ["Next.js 15", "React", "TypeScript", "Tailwind CSS", "Framer Motion", "HTML5", "CSS3 / SCSS", "JavaScript ES6+"]],
-            ["Backend", ["Node.js", "Express.js", "MongoDB", "Mongoose", "REST API", "JWT Auth"]],
-            ["Tools & Deployment", ["Git / GitHub", "VS Code", "Vercel", "Netlify", "Render", "Postman", "Turborepo", "npm Workspaces"]],
-            ["Languages", ["Hindi", "English"]],
-          ].map(([label, tags]) => (
-            <div key={label as string} className="skill-card">
-              <div className="skill-card-label">{label}</div>
-              <div className="skill-tags">{(tags as string[]).map((t) => <span key={t} className="tag">{t}</span>)}</div>
+          {site.skills.groups.map((g, gi) => (
+            <div key={gi} className="skill-card">
+              <div className="skill-card-label">{g.label}</div>
+              <div className="skill-tags">{g.tags.map((t, ti) => <span key={ti} className="tag">{t}</span>)}</div>
             </div>
           ))}
         </div>
@@ -369,8 +374,8 @@ export function Portfolio({ onOpenStore }: Props) {
       {/* PROJECTS */}
       <section className="projects" id="projects">
         <div className="projects-header fade-up">
-          <div className="section-label">03 projects</div>
-          <h2 className="projects-title">SELECTED<br /><em style={{ fontStyle: "italic", color: "var(--muted)" }}>Work</em></h2>
+          <div className="section-label">{site.projects.label}</div>
+          <h2 className="projects-title">{site.projects.titleTop}<br /><em style={{ fontStyle: "italic", color: "var(--muted)" }}>{site.projects.titleEm}</em></h2>
         </div>
         <div className="project-featured fade-up">
           <div className="project-featured-visual">
@@ -420,7 +425,7 @@ export function Portfolio({ onOpenStore }: Props) {
             ))}
         </div>
         <div style={{ marginTop: 36, textAlign: "center", paddingTop: 36, borderTop: "1px solid var(--border)" }}>
-          <a href="https://github.com/abhyanshu2" target="_blank" rel="noopener" className="btn-ghost">View All on GitHub ↗</a>
+          <a href={site.projects.githubUrl} target="_blank" rel="noopener" className="btn-ghost">{site.projects.allButton}</a>
         </div>
       </section>
 
@@ -430,28 +435,18 @@ export function Portfolio({ onOpenStore }: Props) {
       {/* EDUCATION */}
       <section className="education" id="education">
         <div className="fade-up">
-          <div className="section-label">05 education</div>
-          <h2 className="education-title">LEARNING<br /><em style={{ fontStyle: "italic", color: "var(--muted)" }}>Path</em></h2>
+          <div className="section-label">{site.education.label}</div>
+          <h2 className="education-title">{site.education.titleTop}<br /><em style={{ fontStyle: "italic", color: "var(--muted)" }}>{site.education.titleEm}</em></h2>
         </div>
         <div className="edu-list fade-up">
-          <div className="edu-item">
-            <span className="edu-year">2023 - NOW</span>
-            <span className="edu-degree">Diploma in Computer Science &amp; Engg<br /><small style={{ color: "var(--muted2)", fontSize: 12, fontWeight: 400 }}>Currently in 4th Semester</small></span>
-            <span className="edu-school">Pursuing Diploma</span>
-            <span className="edu-score">In Progress</span>
-          </div>
-          <div className="edu-item">
-            <span className="edu-year">2023</span>
-            <span className="edu-degree">12th Science (BSEB)</span>
-            <span className="edu-school">Akshyawat College Mahua, Vaishali</span>
-            <span className="edu-score">60%</span>
-          </div>
-          <div className="edu-item">
-            <span className="edu-year">2021</span>
-            <span className="edu-degree">10th CBSE</span>
-            <span className="edu-school">Delhi Public School International, Muzaffarpur</span>
-            <span className="edu-score">80%</span>
-          </div>
+          {site.education.items.map((e, i) => (
+            <div key={i} className="edu-item">
+              <span className="edu-year">{e.year}</span>
+              <span className="edu-degree">{e.degree}{e.note && (<><br /><small style={{ color: "var(--muted2)", fontSize: 12, fontWeight: 400 }}>{e.note}</small></>)}</span>
+              <span className="edu-school">{e.school}</span>
+              <span className="edu-score">{e.score}</span>
+            </div>
+          ))}
         </div>
       </section>
 

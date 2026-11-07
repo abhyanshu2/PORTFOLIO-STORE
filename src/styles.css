@@ -1708,3 +1708,19 @@ html.store-wiping .portfolio-under{transition:none !important}
 @media(min-width:769px){
   .hero{padding-top:120px}
 }
+
+.admin-topbar-left{display:flex;align-items:center;gap:12px;min-width:0}
+.admin-side-toggle{display:grid;place-items:center;width:40px;height:40px;flex-shrink:0;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text);cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.admin-side-toggle:hover{background:var(--surface2);color:var(--heading);border-color:var(--border-strong)}
+.admin-shell.side-collapsed .admin-side{display:none}
+.admin-shell.side-collapsed .admin-main{max-width:none}
+.admin-shell.side-collapsed .dw-studio{grid-template-columns:1fr}
+.admin-shell.side-collapsed .dw-preview-col{position:static}
+.admin-shell.side-collapsed .dw-preview-box{height:clamp(320px,52vh,560px)}
+.admin-shell.side-collapsed .dw-studio .dw-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:900px){
+  .admin-shell.side-collapsed .dw-studio .dw-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:560px){
+  .admin-shell.side-collapsed .dw-studio .dw-grid{grid-template-columns:1fr}
+}
