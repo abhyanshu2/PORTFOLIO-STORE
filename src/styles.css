@@ -1408,9 +1408,7 @@ html.store-wiping .portfolio-under{transition:none !important}
   .tag{font-size:10.5px}
 }
 
-/* ══════════════════════════════════════════
-   STORE — redesigned (classes start with st-)
-══════════════════════════════════════════ */
+
 .st-header{
   position:sticky; top:0; z-index:5;
   display:flex; align-items:center; gap:18px;
