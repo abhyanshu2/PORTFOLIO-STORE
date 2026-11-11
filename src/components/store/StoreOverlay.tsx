@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { CATEGORIES, type CategorySlug } from "@/data/store/categories";
 import type { Template } from "@/data/store/templates";
+import FlexCarousel, { type FlexCarouselItem } from "./FlexCarousel";
+import HoloCard from "./HoloCard";
+import { monogramCover } from "@/lib/template-cover";
+import { Lenis, prefersReducedMotion, smoothEase, startLenis } from "@/lib/smooth-scroll";
 import { buildHireMeUrl, buildWhatsAppUrl } from "@/data/store/contact";
 import { useSiteContent } from "@/lib/site-content";
 import { useTemplates, useMyProducts, useResources, useServices } from "@/lib/use-store-data";
@@ -49,8 +53,61 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 type Props = { open: boolean; onClose: () => void };
 
+const REVEAL_SELECTOR =
+  ".st-hero-copy > *, .st-showcase, .st-head, .st-card, .st-wide-grid > *, .st-res, .st-svc-grid > *, .st-tile";
+
+function useScrollReveal(open: boolean) {
+  useEffect(() => {
+    if (!open) return;
+    const body = document.querySelector(".store-body");
+    if (!body) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const timers: number[] = [];
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          const el = e.target as HTMLElement;
+          io.unobserve(el);
+          el.classList.add("in");
+          timers.push(
+            window.setTimeout(() => el.classList.remove("st-reveal", "in"), 1200),
+          );
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -6% 0px" },
+    );
+
+    const seen = new WeakSet<Element>();
+    const prepare = () => {
+      let n = 0;
+      body.querySelectorAll(REVEAL_SELECTOR).forEach((el) => {
+        if (seen.has(el)) return;
+        seen.add(el);
+        el.classList.add("st-reveal");
+        (el as HTMLElement).style.setProperty("--rd", `${(n % 4) * 80}ms`);
+        n++;
+        io.observe(el);
+      });
+    };
+
+    prepare();
+    const mo = new MutationObserver(prepare);
+    mo.observe(body, { childList: true, subtree: true });
+
+    return () => {
+      mo.disconnect();
+      io.disconnect();
+      timers.forEach((t) => window.clearTimeout(t));
+      body.querySelectorAll(".st-reveal").forEach((el) => el.classList.remove("st-reveal", "in"));
+    };
+  }, [open]);
+}
+
 export function StoreOverlay({ open, onClose }: Props) {
   const [category, setCategory] = useState<CategorySlug>("all");
+  const [carIndex, setCarIndex] = useState(0);
   const [query, setQuery] = useState("");
   const [preview, setPreview] = useState<Template | null>(null);
   const [activeShot, setActiveShot] = useState(0);
@@ -60,6 +117,21 @@ export function StoreOverlay({ open, onClose }: Props) {
 
   const site = useSiteContent();
   const st = site.store;
+  useScrollReveal(open);
+  const lenisRef = useRef<InstanceType<typeof Lenis> | null>(null);
+
+  useEffect(() => {
+    if (!open || prefersReducedMotion()) return;
+    const wrapper = document.querySelector<HTMLElement>(".store-body");
+    if (!wrapper) return;
+    const lenis = new Lenis({ wrapper, content: wrapper, duration: 1.1, easing: smoothEase, smoothWheel: true });
+    lenisRef.current = lenis;
+    const stop = startLenis(lenis);
+    return () => {
+      lenisRef.current = null;
+      stop();
+    };
+  }, [open]);
   const { data: TEMPLATES } = useTemplates();
   const { data: MY_PRODUCTS } = useMyProducts();
   const { data: RESOURCES } = useResources();
@@ -107,7 +179,10 @@ export function StoreOverlay({ open, onClose }: Props) {
   }, [open]);
 
   const goTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (lenisRef.current) lenisRef.current.scrollTo(el);
+    else el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const filtered = useMemo(() => {
@@ -137,6 +212,21 @@ export function StoreOverlay({ open, onClose }: Props) {
       TEMPLATES[0],
     [TEMPLATES],
   );
+
+  const carouselItems = useMemo<FlexCarouselItem[]>(
+    () =>
+      filtered.map((t) => ({
+        src: t.cover || monogramCover(t),
+        alt: `${t.name} preview`,
+        title: t.name,
+        subtitle: `₹${t.price} · ${t.category.charAt(0).toUpperCase()}${t.category.slice(1)}`,
+      })),
+    [filtered],
+  );
+  const activeTpl = filtered[carIndex] ?? filtered[0];
+  const holo = st.holo;
+  const { height: carouselHeight, ...carouselProps } = st.carousel;
+  const heroTpl = TEMPLATES.find((t) => t.id === holo.featuredId) ?? featured;
 
   const openPreview = (t: Template) => {
     setPreview(t);
@@ -227,11 +317,36 @@ export function StoreOverlay({ open, onClose }: Props) {
               </div>
             </div>
 
-            {featured && (
-              <div className="st-showcase">
-                <span className="st-showcase-tag">★ Featured</span>
-                <TemplateCard t={featured} index={0} onPreview={() => openPreview(featured)} />
+            {holo.enabled && heroTpl ? (
+              <div className="st-showcase holo">
+                <HoloCard
+                  image={heroTpl.cover || monogramCover(heroTpl)}
+                  alt={heroTpl.name}
+                  preset={holo.preset}
+                  foilColor={holo.foilColor}
+                  intensity={holo.intensity}
+                  scale={holo.scale}
+                  edgeSparkle={holo.edgeSparkle}
+                  frame={holo.frame}
+                  glare={holo.glare}
+                  tiltMax={holo.tiltMax}
+                  hoverScale={holo.hoverScale}
+                  radius={holo.radius}
+                  width={holo.width}
+                  idle={holo.idle}
+                  shadow={holo.shadow}
+                />
+                <button className="st-btn" onClick={() => openPreview(heroTpl)}>
+                  {heroTpl.name} · View details
+                </button>
               </div>
+            ) : (
+              featured && (
+                <div className="st-showcase">
+                  <span className="st-showcase-tag">★ Featured</span>
+                  <TemplateCard t={featured} index={0} onPreview={() => openPreview(featured)} />
+                </div>
+              )
             )}
           </section>
 
@@ -276,11 +391,42 @@ export function StoreOverlay({ open, onClose }: Props) {
                 </button>
               </div>
             ) : (
-              <div className="st-grid">
-                {filtered.map((t, i) => (
-                  <TemplateCard key={t.id} t={t} index={i} onPreview={() => openPreview(t)} />
-                ))}
-              </div>
+              <>
+                <div className="st-carousel" data-lenis-prevent-wheel style={{ height: `min(${carouselHeight}px, 84vh)` }}>
+                  {open && (
+                    <FlexCarousel
+                      items={carouselItems}
+                      {...carouselProps}
+                      onChange={(i) => setCarIndex(i)}
+                      onSelect={(i) => {
+                        const t = filtered[i];
+                        if (t) openPreview(t);
+                      }}
+                    />
+                  )}
+                </div>
+                {activeTpl && (
+                  <div className="st-car-bar">
+                    <button className="st-btn" onClick={() => openPreview(activeTpl)}>
+                      View details
+                    </button>
+                    <button
+                      className="st-btn primary"
+                      onClick={() =>
+                        recordOrderAndOpen(
+                          "template",
+                          activeTpl.id,
+                          activeTpl.name,
+                          activeTpl.price,
+                          buildWhatsAppUrl(activeTpl.name, st.whatsappNumber),
+                        )
+                      }
+                    >
+                      Buy on WhatsApp ↗
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </section>
 

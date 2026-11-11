@@ -8,6 +8,7 @@ import TechText from "./TechText";
 import { driftWallProps, useDriftWall } from "@/lib/drift-wall";
 import { useProjects } from "@/lib/use-store-data";
 import { rich, useSiteContent } from "@/lib/site-content";
+import { Lenis, prefersReducedMotion, scrollMargin, smoothEase, startLenis } from "@/lib/smooth-scroll";
 
 
 type Props = { onOpenStore: () => void };
@@ -130,12 +131,46 @@ export function Portfolio({ onOpenStore }: Props) {
     return () => { document.body.style.overflow = ""; };
   }, [menuOpen]);
 
+  useEffect(() => {
+    if (prefersReducedMotion()) return;
+    const lenis = new Lenis({
+      duration: 1.15,
+      easing: smoothEase,
+      smoothWheel: true,
+      prevent: () => document.body.style.overflow === "hidden",
+    });
+    const stop = startLenis(lenis);
+    const onClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      const a = (e.target as Element).closest?.('a[href^="#"]');
+      if (!a) return;
+      const id = a.getAttribute("href")!.slice(1);
+      if (!id) {
+        e.preventDefault();
+        lenis.scrollTo(0);
+        return;
+      }
+      const el = document.getElementById(id);
+      if (!el) return;
+      e.preventDefault();
+      lenis.scrollTo(el, { offset: -scrollMargin(el) });
+    };
+    document.addEventListener("click", onClick);
+    return () => {
+      document.removeEventListener("click", onClick);
+      stop();
+    };
+  }, []);
+
   // Fade-up intersection observer
   useEffect(() => {
     const els = document.querySelectorAll(".fade-up");
     const obs = new IntersectionObserver((entries) => {
+      let n = 0;
       entries.forEach((e) => {
         if (e.isIntersecting) {
+          (e.target as HTMLElement).style.animationDelay = `${n * 90}ms`;
+          n++;
           e.target.classList.add("visible");
           obs.unobserve(e.target);
         }

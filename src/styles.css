@@ -1408,7 +1408,9 @@ html.store-wiping .portfolio-under{transition:none !important}
   .tag{font-size:10.5px}
 }
 
-
+/* ══════════════════════════════════════════
+   STORE — redesigned (classes start with st-)
+══════════════════════════════════════════ */
 .st-header{
   position:sticky; top:0; z-index:5;
   display:flex; align-items:center; gap:18px;
@@ -1722,3 +1724,17 @@ html.store-wiping .portfolio-under{transition:none !important}
 @media (max-width:560px){
   .admin-shell.side-collapsed .dw-studio .dw-grid{grid-template-columns:1fr}
 }
+.st-reveal{opacity:0; translate:0 32px; transition:opacity .75s cubic-bezier(.22,1,.36,1) var(--rd,0ms), translate .75s cubic-bezier(.22,1,.36,1) var(--rd,0ms)}
+.st-reveal.in{opacity:1; translate:0 0}
+.store-shell.open .st-card.st-reveal,.store-shell.open .st-res.st-reveal{animation:none}
+@media(prefers-reduced-motion:reduce){.st-reveal{opacity:1; translate:none; transition:none}}
+.st-carousel{position:relative; height:clamp(440px,64vh,620px); margin-top:10px; color:var(--heading); border:1px solid var(--border); border-radius:20px; background:var(--bg2); overflow:hidden}
+.st-car-bar{display:flex; justify-content:center; flex-wrap:wrap; gap:12px; margin-top:18px}
+@media(max-width:560px){.st-carousel{height:clamp(400px,60vh,520px)}}
+.st-showcase.holo{transform:none; max-width:none; display:flex; flex-direction:column; align-items:center; gap:26px}
+.st-showcase.holo:hover{transform:none}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto !important}
+.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}
+.lenis.lenis-stopped{overflow:hidden}
+.lenis.lenis-scrolling iframe{pointer-events:none}

@@ -64,6 +64,48 @@ export type SiteContent = {
     browseButton: string;
     whatsappButton: string;
     whatsappNumber: string;
+    carousel: {
+      height: number;
+      preset: "liquid" | "ribbon" | "vortex" | "arch";
+      intro: "rise" | "bloom" | "spin" | "deal" | "none";
+      fit: "natural" | "portrait" | "square" | "landscape";
+      cardHeight: number;
+      gap: number;
+      radius: number;
+      lensWidth: number;
+      lensHeight: number;
+      tilt: number;
+      roundness: number;
+      bend: number;
+      reach: number;
+      curl: "twist" | "rise" | "fall";
+      dispersion: number;
+      liquid: number;
+      followCursor: boolean;
+      squeeze: number;
+      focusOnClick: boolean;
+      autoplay: boolean;
+      interval: number;
+      captions: boolean;
+      captureWheel: boolean;
+    };
+    holo: {
+      enabled: boolean;
+      featuredId: string;
+      preset: "bursts" | "stars" | "shards" | "cosmos" | "rainbow" | "swirl" | "glitter" | "gold";
+      foilColor: string;
+      intensity: number;
+      scale: number;
+      edgeSparkle: number;
+      frame: number;
+      glare: number;
+      tiltMax: number;
+      hoverScale: number;
+      radius: number;
+      width: number;
+      idle: boolean;
+      shadow: boolean;
+    };
     contacts: { label: string; value: string; href: string }[];
     sections: Record<
       "templates" | "products" | "resources" | "services" | "contact",
@@ -167,6 +209,48 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     browseButton: "Browse templates ↓",
     whatsappButton: "Chat on WhatsApp ↗",
     whatsappNumber: "916206358342",
+    carousel: {
+      height: 560,
+      preset: "liquid",
+      intro: "rise",
+      fit: "natural",
+      cardHeight: 0.5,
+      gap: 12,
+      radius: 0,
+      lensWidth: 0.74,
+      lensHeight: 1.18,
+      tilt: 62,
+      roundness: 1,
+      bend: 0.34,
+      reach: 0.38,
+      curl: "twist",
+      dispersion: 0.45,
+      liquid: 0,
+      followCursor: false,
+      squeeze: 0.2,
+      focusOnClick: false,
+      autoplay: false,
+      interval: 4,
+      captions: true,
+      captureWheel: true,
+    },
+    holo: {
+      enabled: true,
+      featuredId: "",
+      preset: "bursts",
+      foilColor: "#e2e6ec",
+      intensity: 0.85,
+      scale: 1,
+      edgeSparkle: 0.8,
+      frame: 4,
+      glare: 0.5,
+      tiltMax: 14,
+      hoverScale: 1.04,
+      radius: 14,
+      width: 320,
+      idle: true,
+      shadow: true,
+    },
     contacts: [
       { label: "WhatsApp", value: "+91 6206358342", href: "https://wa.me/916206358342" },
       { label: "Email", value: "abhyanshu2@gmail.com", href: "mailto:abhyanshu2@gmail.com" },

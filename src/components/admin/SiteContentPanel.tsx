@@ -1,5 +1,9 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
+import { useTemplates } from "@/lib/use-store-data";
+import { monogramCover } from "@/lib/template-cover";
+import HoloCard from "@/components/store/HoloCard";
+import FlexCarousel from "@/components/store/FlexCarousel";
 import {
   DEFAULT_SITE_CONTENT,
   loadSiteContent,
@@ -91,6 +95,240 @@ function Lines({ label, path, help, rows = 5 }: { label: string; path: Path; hel
   const { draft, set } = useCtx();
   return (
     <ListField label={label} list={(getAt(draft, path) as string[]) ?? []} onChange={(n) => set(path, n)} sep={"\n"} rows={rows} help={help} />
+  );
+}
+
+function Select({ label, path, options }: { label: string; path: Path; options: { value: string; label: string }[] }) {
+  const { draft, set } = useCtx();
+  return (
+    <div className="admin-field">
+      <label className="admin-label">{label}</label>
+      <select className="admin-select" value={String(getAt(draft, path) ?? "")} onChange={(e) => set(path, e.target.value)}>
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function Toggle({ label, path }: { label: string; path: Path }) {
+  const { draft, set } = useCtx();
+  return (
+    <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", padding: "10px 0" }}>
+      <input
+        type="checkbox"
+        checked={Boolean(getAt(draft, path))}
+        onChange={(e) => set(path, e.target.checked)}
+        style={{ width: 18, height: 18, accentColor: "var(--accent)" }}
+      />
+      <span>{label}</span>
+    </label>
+  );
+}
+
+function ColorField({ label, path }: { label: string; path: Path }) {
+  const { draft, set } = useCtx();
+  const value = String(getAt(draft, path) ?? "");
+  return (
+    <div className="admin-field">
+      <label className="admin-label">{label}</label>
+      <div style={{ display: "flex", gap: 8 }}>
+        <input
+          type="color"
+          value={/^#[0-9a-fA-F]{6}$/.test(value) ? value : "#e2e6ec"}
+          onChange={(e) => set(path, e.target.value)}
+          style={{ width: 48, height: 44, padding: 2, border: "1px solid var(--border-strong)", borderRadius: 10, background: "var(--bg)", cursor: "pointer" }}
+        />
+        <input className="admin-input" value={value} onChange={(e) => set(path, e.target.value)} />
+      </div>
+    </div>
+  );
+}
+
+function Slider({
+  label,
+  path,
+  min,
+  max,
+  step,
+  unit = "",
+}: {
+  label: string;
+  path: Path;
+  min: number;
+  max: number;
+  step: number;
+  unit?: string;
+}) {
+  const { draft, set } = useCtx();
+  const value = Number(getAt(draft, path) ?? 0);
+  return (
+    <div className="admin-field">
+      <label className="admin-label" style={{ display: "flex", justifyContent: "space-between" }}>
+        <span>{label}</span>
+        <b style={{ color: "var(--heading)" }}>
+          {+value.toFixed(2)}
+          {unit}
+        </b>
+      </label>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => set(path, Number(e.target.value))}
+        style={{ width: "100%", accentColor: "var(--accent)" }}
+      />
+    </div>
+  );
+}
+
+const CAROUSEL_PRESETS: Record<string, Record<string, number | string | boolean>> = {
+  liquid: { lensWidth: 0.74, lensHeight: 1.18, tilt: 62, roundness: 1, bend: 0.34, reach: 0.38, curl: "twist", dispersion: 0.45, liquid: 0, followCursor: false },
+  ribbon: { lensWidth: 0.8, lensHeight: 0.8, tilt: 0, roundness: 1, bend: 0.34, reach: 0.34, curl: "twist", dispersion: 0.4, liquid: 0, followCursor: false },
+  vortex: { lensWidth: 0.7, lensHeight: 0.95, tilt: 30, roundness: 1, bend: 0.46, reach: 0.3, curl: "twist", dispersion: 0.5, liquid: 0, followCursor: false },
+  arch: { lensWidth: 0.8, lensHeight: 0.8, tilt: 0, roundness: 1, bend: 0.3, reach: 0.36, curl: "rise", dispersion: 0.4, liquid: 0, followCursor: false },
+};
+
+function CarouselSettings() {
+  const { draft, set } = useCtx();
+  const { data: templates } = useTemplates();
+  const c = draft.store.carousel;
+  const items = templates.slice(0, 8).map((t) => ({
+    src: t.cover || monogramCover(t),
+    alt: t.name,
+    title: t.name,
+    subtitle: `₹${t.price}`,
+  }));
+  const opt = (list: string[]) => list.map((v) => ({ value: v, label: v.charAt(0).toUpperCase() + v.slice(1) }));
+  const base = ["store", "carousel"];
+  const p = (k: string): Path => [...base, k];
+  return (
+    <Group title="Templates carousel (All Templates section)">
+      <p style={{ ...hint, marginBottom: 12 }}>
+        The sliding bent-card carousel. Drag the preview below to test. Card height and Box height change the size.
+      </p>
+      <div style={{ height: 360, border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden", marginBottom: 18, color: "var(--heading)" }}>
+        {items.length > 0 && <FlexCarousel items={items} {...c} captureWheel={false} />}
+      </div>
+      <div style={row}>
+        <div className="admin-field">
+          <label className="admin-label">Preset</label>
+          <select
+            className="admin-select"
+            value={c.preset}
+            onChange={(e) => {
+              const v = e.target.value;
+              set(p("preset"), v);
+              Object.entries(CAROUSEL_PRESETS[v]).forEach(([k, val]) => set(p(k), val));
+            }}
+          >
+            {opt(["liquid", "ribbon", "vortex", "arch"]).map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <Select label="Intro" path={p("intro")} options={opt(["rise", "bloom", "spin", "deal", "none"])} />
+        <Select label="Fit" path={p("fit")} options={opt(["natural", "portrait", "square", "landscape"])} />
+        <Select label="Curl" path={p("curl")} options={opt(["twist", "rise", "fall"])} />
+      </div>
+      <div style={row}>
+        <Slider label="Box height" path={p("height")} min={320} max={900} step={10} unit="px" />
+        <Slider label="Card height" path={p("cardHeight")} min={0.2} max={0.9} step={0.01} />
+        <Slider label="Gap" path={p("gap")} min={0} max={60} step={1} unit="px" />
+        <Slider label="Radius" path={p("radius")} min={0} max={60} step={1} unit="px" />
+        <Slider label="Lens width" path={p("lensWidth")} min={0.2} max={2} step={0.01} />
+        <Slider label="Lens height" path={p("lensHeight")} min={0.2} max={2} step={0.01} />
+        <Slider label="Tilt" path={p("tilt")} min={0} max={90} step={1} unit="°" />
+        <Slider label="Roundness" path={p("roundness")} min={0} max={1} step={0.01} />
+        <Slider label="Bend" path={p("bend")} min={0} max={1} step={0.01} />
+        <Slider label="Reach" path={p("reach")} min={0.05} max={1} step={0.01} />
+        <Slider label="Dispersion" path={p("dispersion")} min={0} max={1} step={0.01} />
+        <Slider label="Liquid" path={p("liquid")} min={0} max={1} step={0.01} />
+        <Slider label="Squeeze" path={p("squeeze")} min={0} max={1} step={0.01} />
+        <Slider label="Autoplay interval" path={p("interval")} min={1} max={10} step={0.5} unit="s" />
+      </div>
+      <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+        <Toggle label="Follow cursor" path={p("followCursor")} />
+        <Toggle label="Zoom card on click" path={p("focusOnClick")} />
+        <Toggle label="Autoplay" path={p("autoplay")} />
+        <Toggle label="Captions" path={p("captions")} />
+        <Toggle label="Mouse wheel moves cards" path={p("captureWheel")} />
+      </div>
+    </Group>
+  );
+}
+
+function HoloSettings() {
+  const { draft } = useCtx();
+  const { data: templates } = useTemplates();
+  const h = draft.store.holo;
+  const chosen = templates.find((t) => t.id === h.featuredId) ?? templates[0];
+  const image = chosen ? chosen.cover || monogramCover(chosen) : undefined;
+  return (
+    <Group title="Hero card (Premium Templates, right side)">
+      <p style={{ ...hint, marginBottom: 12 }}>The shiny tilting card next to your store title. Move your mouse over it to test. Card size makes it bigger or smaller (the preview shows up to 360px).</p>
+      <div style={{ display: "flex", justifyContent: "center", padding: "18px 0 28px" }}>
+        {image && (
+          <HoloCard
+            key={h.preset}
+            image={image}
+            alt={chosen?.name ?? ""}
+            preset={h.preset}
+            foilColor={h.foilColor}
+            intensity={h.intensity}
+            scale={h.scale}
+            edgeSparkle={h.edgeSparkle}
+            frame={h.frame}
+            glare={h.glare}
+            tiltMax={h.tiltMax}
+            hoverScale={h.hoverScale}
+            radius={h.radius}
+            width={Math.min(h.width, 360)}
+            idle={h.idle}
+            shadow={h.shadow}
+          />
+        )}
+      </div>
+      <Toggle label="Show this shiny card (turn off to show the normal card)" path={["store", "holo", "enabled"]} />
+      <div style={row}>
+        <Select
+          label="Template on the card"
+          path={["store", "holo", "featuredId"]}
+          options={[{ value: "", label: "Automatic (bestseller)" }, ...templates.map((t) => ({ value: t.id, label: t.name }))]}
+        />
+        <Select
+          label="Style"
+          path={["store", "holo", "preset"]}
+          options={["bursts", "stars", "shards", "cosmos", "rainbow", "swirl", "glitter", "gold"].map((v) => ({
+            value: v,
+            label: v.charAt(0).toUpperCase() + v.slice(1),
+          }))}
+        />
+        <ColorField label="Foil colour" path={["store", "holo", "foilColor"]} />
+      </div>
+      <div style={row}>
+        <Slider label="Intensity" path={["store", "holo", "intensity"]} min={0} max={1} step={0.01} />
+        <Slider label="Scale" path={["store", "holo", "scale"]} min={0.25} max={4} step={0.05} />
+        <Slider label="Edge sparkle" path={["store", "holo", "edgeSparkle"]} min={0} max={1} step={0.01} />
+        <Slider label="Frame" path={["store", "holo", "frame"]} min={0} max={20} step={1} unit="%" />
+        <Slider label="Glare" path={["store", "holo", "glare"]} min={0} max={1} step={0.01} />
+        <Slider label="Tilt" path={["store", "holo", "tiltMax"]} min={0} max={45} step={1} unit="°" />
+        <Slider label="Hover scale" path={["store", "holo", "hoverScale"]} min={0.8} max={1.3} step={0.01} />
+        <Slider label="Corner radius" path={["store", "holo", "radius"]} min={0} max={40} step={1} unit="px" />
+        <Slider label="Card size (width)" path={["store", "holo", "width"]} min={160} max={560} step={1} unit="px" />
+      </div>
+      <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+        <Toggle label="Idle shimmer" path={["store", "holo", "idle"]} />
+        <Toggle label="Shadow" path={["store", "holo", "shadow"]} />
+      </div>
+    </Group>
   );
 }
 
@@ -426,6 +664,8 @@ export function SiteContentPanel() {
 
       {!loading && section === "store" && (
         <>
+          <HoloSettings />
+          <CarouselSettings />
           <Group title="Store header & hero">
             <p style={{ ...hint, marginBottom: 12 }}>Templates, products, resources and services are edited in their own tabs.</p>
             <div style={row}>
