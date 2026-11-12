@@ -54,7 +54,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 type Props = { open: boolean; onClose: () => void };
 
 const REVEAL_SELECTOR =
-  ".st-hero-copy > *, .st-showcase, .st-head, .st-card, .st-wide-grid > *, .st-res, .st-svc-grid > *, .st-tile";
+  ".st-hero-copy > *, .st-showcase, .st-head, .st-card, .st-mcard, .st-wide-grid > *, .st-res, .st-svc-grid > *, .st-tile";
 
 function useScrollReveal(open: boolean) {
   useEffect(() => {
@@ -108,6 +108,15 @@ function useScrollReveal(open: boolean) {
 export function StoreOverlay({ open, onClose }: Props) {
   const [category, setCategory] = useState<CategorySlug>("all");
   const [carIndex, setCarIndex] = useState(0);
+  const [compact, setCompact] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const sync = () => setCompact(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
   const [query, setQuery] = useState("");
   const [preview, setPreview] = useState<Template | null>(null);
   const [activeShot, setActiveShot] = useState(0);
@@ -392,6 +401,34 @@ export function StoreOverlay({ open, onClose }: Props) {
               </div>
             ) : (
               <>
+                {compact && (
+                  <div className="st-mgrid">
+                    {filtered.map((t) => (
+                      <article key={t.id} className="st-mcard" style={{ "--cc": CATEGORY_COLORS[t.category] ?? "var(--accent)" } as CSSProperties}>
+                        <button type="button" className="st-mcover" onClick={() => openPreview(t)} aria-label={`Preview ${t.name}`}>
+                          <img src={t.cover || monogramCover(t)} alt="" loading="lazy" draggable={false} />
+                        </button>
+                        <div className="st-mbody">
+                          <h4>{t.name}</h4>
+                          <div className="st-mmeta">
+                            <b>₹{t.price}</b>
+                            <span>{t.category}</span>
+                          </div>
+                          <button
+                            type="button"
+                            className="st-btn primary"
+                            onClick={() =>
+                              recordOrderAndOpen("template", t.id, t.name, t.price, buildWhatsAppUrl(t.name, st.whatsappNumber))
+                            }
+                          >
+                            Buy on WhatsApp ↗
+                          </button>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                )}
+                {!compact && (
                 <div className="st-carousel" data-lenis-prevent-wheel style={{ height: `min(${carouselHeight}px, 84vh)` }}>
                   {open && (
                     <FlexCarousel
@@ -405,7 +442,8 @@ export function StoreOverlay({ open, onClose }: Props) {
                     />
                   )}
                 </div>
-                {activeTpl && (
+                )}
+                {!compact && activeTpl && (
                   <div className="st-car-bar">
                     <button className="st-btn" onClick={() => openPreview(activeTpl)}>
                       View details

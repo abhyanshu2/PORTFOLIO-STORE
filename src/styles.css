@@ -1738,3 +1738,13 @@ html.lenis,html.lenis body{height:auto}
 .lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}
 .lenis.lenis-stopped{overflow:hidden}
 .lenis.lenis-scrolling iframe{pointer-events:none}
+.st-mgrid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:12px}
+@media(min-width:640px){.st-mgrid{grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px}}
+.st-mcard{display:flex; flex-direction:column; min-width:0; background:var(--bg2); border:1px solid var(--border); border-radius:16px; overflow:hidden}
+.st-mcover{position:relative; display:block; width:100%; aspect-ratio:3/4; padding:0; border:0; background:var(--bg2); cursor:pointer; overflow:hidden}
+.st-mcover img{display:block; width:100%; height:100%; object-fit:cover}
+.st-mbody{display:flex; flex-direction:column; gap:6px; padding:12px 12px 14px}
+.st-mbody h4{margin:0; font-family:'Playfair Display',serif; font-size:17px; font-weight:700; line-height:1.25; color:var(--heading); overflow-wrap:anywhere}
+.st-mmeta{display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:12px; color:var(--muted); text-transform:capitalize}
+.st-mmeta b{font-size:16px; font-weight:600; color:var(--accent2)}
+.st-mbody .st-btn{width:100%; justify-content:center; margin-top:6px; padding:11px 10px; font-size:10.5px}
